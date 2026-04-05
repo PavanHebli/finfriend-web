@@ -34,16 +34,9 @@ def render_form_panel():
     with st.form("financial_form"):
         render_api_config()
         render_income_section()
-
-        st.markdown("---")
-
-        tab1, tab2, tab3 = st.tabs(["Expenses", "Financial Position", "Background"])
-        with tab1:
-            render_expenses_section()
-        with tab2:
-            render_position_section()
-        with tab3:
-            render_context_section()
+        render_expenses_section()
+        render_position_section()
+        render_context_section()
 
         st.markdown("---")
         submitted = st.form_submit_button("Show me my financial picture →", type="primary")

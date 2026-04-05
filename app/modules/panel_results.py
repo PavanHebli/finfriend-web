@@ -96,6 +96,10 @@ def render_results_panel():
 
     st.markdown("---")
     st.markdown("### Your Financial Story")
+    st.markdown(
+        "<style> section[data-testid='stMain'] .stMarkdown p { font-size: 1.1rem; line-height: 1.8; } </style>",
+        unsafe_allow_html=True
+    )
 
     prompt = build_prompt(
         st.session_state,

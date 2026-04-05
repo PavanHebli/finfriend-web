@@ -2,6 +2,8 @@
 
 An open source personal finance app that helps you understand your financial health through honest scoring and AI-powered insights.
 
+**Live app:** https://finfriend-web.streamlit.app/
+
 ---
 
 ## What it does
@@ -36,7 +38,7 @@ App gives you ONE clear next step
 
 - **Python** 3.9+
 - **Streamlit** — UI framework
-- **LLM Providers** — Anthropic, OpenAI, Groq (user's own API key)
+- **LLM Providers** — Anthropic, OpenAI, Groq, Gemini (user's own API key)
 
 ---
 

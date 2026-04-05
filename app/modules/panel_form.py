@@ -61,6 +61,11 @@ def render_form_panel():
 
     st.markdown("---")
 
+    st.info(
+        "**Don't have exact numbers?** Estimates are fine — a rough figure is better than leaving fields at 0. "
+        "Open your bank or credit card app: most show a monthly spending breakdown by category."
+    )
+
     with st.form("financial_form"):
         render_api_config()
         render_income_section()

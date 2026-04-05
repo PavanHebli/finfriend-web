@@ -72,6 +72,7 @@ def render_expenses_section():
     Collects all 7 expense categories.
     """
     st.subheader("Section B: Monthly Expenses")
+    st.caption("Round to the nearest $25. Not sure? Your bank app's monthly summary is the fastest way to check.")
     
     expenses = {}
     
@@ -93,7 +94,7 @@ def render_expenses_section():
             step=25.0,
             format="%.2f"
         )
-        st.caption("Avg: $200–400/month per person")
+        st.caption("Avg: $200–400/month · Tip: weekly shop amount × 4")
         expenses["transport"] = st.number_input(
             "Transport (car, gas, public transit)",
             min_value=0.0,
@@ -109,7 +110,7 @@ def render_expenses_section():
             step=5.0,
             format="%.2f"
         )
-        st.caption("Avg: $50–150/month")
+        st.caption("Avg: $50–150/month · Tip: list them out (Netflix, Spotify, gym…)")
 
     with col2:
         expenses["dining"] = st.number_input(
@@ -119,7 +120,7 @@ def render_expenses_section():
             step=25.0,
             format="%.2f"
         )
-        st.caption("Avg: $150–300/month")
+        st.caption("Avg: $150–300/month · Tip: meals out per week × avg cost × 4")
         expenses["shopping"] = st.number_input(
             "Shopping / Personal",
             min_value=0.0,
@@ -158,7 +159,8 @@ def render_position_section():
             min_value=0.0,
             value=st.session_state.get("savings_total", 0.0),
             step=100.0,
-            format="%.2f"
+            format="%.2f",
+            help="Add up all your bank account balances — checking, savings, and any cash on hand"
         )
         st.session_state.savings_total = savings
         

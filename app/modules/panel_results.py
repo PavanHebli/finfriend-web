@@ -2,6 +2,10 @@ import streamlit as st
 from modules.health import calculate_metrics, score_metrics, calculate_overall_score, get_mirror_label
 from modules.narrative import build_prompt, call_llm
 from modules.education import render_education
+from modules.simulator import render_whatif_simulator
+
+
+_SIM_KEYS = ["sim_income", "sim_dining", "sim_shopping", "sim_subscriptions", "sim_debt_payment"]
 
 
 def render_health_score(score: int, mirror: dict):
@@ -79,6 +83,9 @@ def render_metrics_breakdown(metrics: dict, metric_scores: dict):
 
 def render_results_panel():
     if st.button("← Edit my data"):
+        st.session_state.pop("narrative_text", None)
+        for key in _SIM_KEYS:
+            st.session_state.pop(key, None)
         st.session_state.current_page = "form"
         st.rerun()
 
@@ -87,40 +94,47 @@ def render_results_panel():
 
     st.markdown("---")
 
-    metrics = calculate_metrics(st.session_state)
+    metrics       = calculate_metrics(st.session_state)
     metric_scores = score_metrics(metrics)
     overall_score = calculate_overall_score(metric_scores)
-    mirror = get_mirror_label(overall_score)
+    mirror        = get_mirror_label(overall_score)
 
     render_health_score(overall_score, mirror)
-
     st.markdown("---")
-
     render_metrics_breakdown(metrics, metric_scores)
-
     st.markdown("---")
-    st.markdown("### Your Financial Story")
-    st.markdown(
-        "<style> section[data-testid='stMain'] .stMarkdown p { font-size: 1.1rem; line-height: 1.8; } </style>",
-        unsafe_allow_html=True
-    )
 
-    prompt = build_prompt(
-        st.session_state,
-        metrics,
-        metric_scores,
-        overall_score,
-        mirror
-    )
+    tab1, tab2, tab3 = st.tabs(["Your Financial Story", "What If?", "Ask FinFriend"])
 
-    try:
-        st.write_stream(call_llm(
-            prompt,
-            st.session_state.llm_provider,
-            st.session_state.api_key
-        ))
-    except Exception as e:
-        st.error(f"Could not generate narrative: {str(e)}")
+    with tab1:
+        st.markdown(
+            "<style> section[data-testid='stMain'] .stMarkdown p { font-size: 1.1rem; line-height: 1.8; } </style>",
+            unsafe_allow_html=True
+        )
 
-    st.markdown("---")
-    render_education(metric_scores)
+        if "narrative_text" not in st.session_state:
+            prompt = build_prompt(st.session_state, metrics, metric_scores, overall_score, mirror)
+            try:
+                result = st.write_stream(call_llm(
+                    prompt,
+                    st.session_state.llm_provider,
+                    st.session_state.api_key
+                ))
+                st.session_state.narrative_text = result
+            except Exception as e:
+                st.error(f"Could not generate narrative: {str(e)}")
+        else:
+            st.markdown(st.session_state.narrative_text.replace("$", "\\$"))
+
+        st.markdown("---")
+        render_education(metric_scores)
+
+    with tab2:
+        render_whatif_simulator(overall_score, metric_scores)
+
+    with tab3:
+        st.info(
+            "**Decision Helper coming soon.** "
+            "You'll be able to ask FinFriend questions like 'I got a raise — what should I do with it?' "
+            "or 'Should I pay off debt or invest first?' — answered with your actual numbers as context."
+        )

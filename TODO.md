@@ -19,10 +19,8 @@ Each entry: what + why | files touched | priority | done
 | # | Feature | What + Why | Files | Done |
 |---|---------|------------|-------|------|
 | 1 | **Form Framing Change** | Change all expense inputs from asking for precision to asking for estimates. Add a note at the top: "Estimates are fine — rough numbers are better than 0. Check your bank app's monthly summary if unsure." Directly unblocks users who don't track spending. | `snapshot.py`, `panel_form.py` | ⬜ |
-| 2 | **Guided Estimation Flow** | For users who don't know a specific expense, add inline mini calculators. E.g. dining: "How many times per week × avg cost?" Groceries: "Roughly per week × 4?" Helps users discover their spending through structured prompting instead of recalling a number they don't have. | `snapshot.py` | ⬜ |
 | 3 | **What-If Simulator** | Sliders on the results page: "What if I cut dining by $200/month?" → score recalculates live. Pure math, no AI, no storage. Highly engaging — users see immediately how spending choices affect their score. Turns FinFriend from a read-only report into an interactive tool. | `panel_results.py`, `health.py` | ⬜ |
 | 4 | **Decision Helper** | Chat input at the bottom of the results panel: "I got a $600 raise — what should I do with it?" or "Should I take this car loan?" The AI already has full financial context from the session. Mostly a prompt change. Users return every time they face a financial decision. | `panel_results.py`, `narrative.py` | ⬜ |
-| 5 | **Module 5: One Next Step** | After the education section, render a styled card with ONE specific action derived from the AI narrative's Q4 answer. Remove Q4 from the stream, make a separate small non-streaming call, display as a closing card. Gives users a single clear takeaway. | `narrative.py`, `panel_results.py`, new `nextstep.py` | ⬜ |
 
 ---
 
@@ -62,6 +60,8 @@ Each entry: what + why | files touched | priority | done
 | Feature | Reason |
 |---------|--------|
 | **Budget Planner Sheet** | High effort, commoditized space (YNAB, Mint, Google Sheets do this better). FinFriend's edge is diagnosis and narrative, not data entry. The intent (help users plan where money goes) is better served by the What-If Simulator (#3) and Goal Tracker (#12). |
+| **Module 5: One Next Step** | Redundant. The narrative's Q4 ("What should you do this month?") already is the one next step. A separate section would repeat it. |
+| **Guided Estimation Flow** | Partially solved already by the form framing change and caption hints. Interactive inline calculators would be overengineering at this stage. |
 
 ---
 

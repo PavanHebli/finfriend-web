@@ -39,12 +39,17 @@ def calculate_metrics(state) -> dict:
     else:
         emergency_fund_months = 0.0  # no data entered
 
+    # Flag: has debt on record but no monthly payment entered.
+    # This is either a data gap or an active non-payment — both are red flags.
+    debt_payment_missing = (state.get("debt_total", 0.0) > 0 and debt_payments == 0.0)
+
     return {
         "savings_rate": round(savings_rate, 1),
         "debt_to_income": round(debt_to_income, 1),
         "emergency_fund_months": round(emergency_fund_months, 1),
         "housing_ratio": round(housing_ratio, 1),
         "net_monthly_flow": round(net_monthly_flow, 2),
+        "debt_payment_missing": debt_payment_missing,
     }
 
 
@@ -70,6 +75,8 @@ def score_metrics(metrics: dict) -> dict:
         scores["savings_rate"] = {"score": 25, "status": "good"}
 
     # Debt-to-Income — CFPB qualified mortgage threshold is 43%
+    # Penalty: if debt exists but monthly payment is $0, cap at warning.
+    # Having unpaid debt with no recorded payment is a red flag regardless of DTI ratio.
     dti = metrics["debt_to_income"]
     if dti > 43:
         scores["debt_to_income"] = {"score": 0, "status": "danger"}
@@ -77,6 +84,8 @@ def score_metrics(metrics: dict) -> dict:
         scores["debt_to_income"] = {"score": 10, "status": "warning"}
     elif dti > 10:
         scores["debt_to_income"] = {"score": 18, "status": "ok"}
+    elif metrics.get("debt_payment_missing"):
+        scores["debt_to_income"] = {"score": 0, "status": "danger"}
     else:
         scores["debt_to_income"] = {"score": 25, "status": "good"}
 

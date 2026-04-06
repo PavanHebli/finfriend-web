@@ -1,4 +1,5 @@
 import streamlit as st
+import plotly.graph_objects as go
 from modules.health import calculate_metrics, score_metrics, calculate_overall_score, get_mirror_label
 from modules.narrative import build_prompt, call_llm
 from modules.education import render_education
@@ -81,6 +82,89 @@ def render_metrics_breakdown(metrics: dict, metric_scores: dict):
     )
 
 
+def render_expense_chart(state: dict, metrics: dict, metric_scores: dict):
+    """
+    Horizontal bar chart showing each expense category as % of income.
+    Bars sorted largest to smallest. Housing bar colored by its status.
+    Dashed reference line at 30% (HUD housing benchmark).
+    """
+    income = state.get("income_main", 0.0) + state.get("income_additional", 0.0)
+    if income == 0:
+        return
+
+    raw = {
+        "Rent / Mortgage":  state.get("expenses_rent", 0.0),
+        "Groceries":        state.get("expenses_groceries", 0.0),
+        "Transport":        state.get("expenses_transport", 0.0),
+        "Subscriptions":    state.get("expenses_subscriptions", 0.0),
+        "Dining out":       state.get("expenses_dining", 0.0),
+        "Shopping":         state.get("expenses_shopping", 0.0),
+        "Other":            state.get("expenses_other", 0.0),
+    }
+
+    # Drop zero-value categories
+    raw = {k: v for k, v in raw.items() if v > 0}
+    if not raw:
+        return
+
+    # Sort largest to smallest so the longest bar is at the top
+    raw = dict(sorted(raw.items(), key=lambda x: x[1], reverse=True))
+
+    labels      = list(raw.keys())
+    amounts     = list(raw.values())
+    percentages = [v / income * 100 for v in amounts]
+
+    status_colors = {
+        "danger":  "#FF4B4B",
+        "warning": "#FF8C00",
+        "ok":      "#1C83E1",
+        "good":    "#00C853",
+    }
+
+    colors = []
+    for label in labels:
+        if label == "Rent / Mortgage":
+            colors.append(status_colors[metric_scores["housing_ratio"]["status"]])
+        else:
+            colors.append("#4A90D9")
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(
+        y=labels,
+        x=percentages,
+        orientation="h",
+        marker_color=colors,
+        text=[f"${a:,.0f}  ({p:.1f}%)" for a, p in zip(amounts, percentages)],
+        textposition="outside",
+        cliponaxis=False,
+    ))
+
+    # HUD housing benchmark reference line
+    fig.add_vline(
+        x=30,
+        line_dash="dash",
+        line_color="rgba(255,255,255,0.25)",
+        annotation_text="30% housing limit",
+        annotation_font_color="rgba(255,255,255,0.45)",
+        annotation_position="top right",
+    )
+
+    fig.update_layout(
+        xaxis_title="% of Monthly Income",
+        xaxis=dict(range=[0, max(max(percentages) * 1.45, 35)]),
+        yaxis=dict(autorange="reversed"),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="white", size=13),
+        height=50 + len(labels) * 45,
+        margin=dict(l=10, r=10, t=10, b=30),
+        showlegend=False,
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+
 def render_results_panel():
     if st.button("← Edit my data"):
         st.session_state.pop("narrative_text", None)
@@ -102,6 +186,9 @@ def render_results_panel():
     render_health_score(overall_score, mirror)
     st.markdown("---")
     render_metrics_breakdown(metrics, metric_scores)
+    st.caption("ℹ️ Ratios are calculated using take-home (after-tax) income — stricter than lender benchmarks, which use gross income.")
+    st.markdown("---")
+    render_expense_chart(st.session_state, metrics, metric_scores)
     st.markdown("---")
 
     tab1, tab2, tab3 = st.tabs(["Your Financial Story", "What If?", "Ask FinFriend"])

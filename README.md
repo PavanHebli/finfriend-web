@@ -28,9 +28,9 @@ App gives you ONE clear next step
 |--------|-------------|--------|
 | 1 — Financial Snapshot | Input form for financial data | ✅ Done |
 | 2 — Health Score + Mirror | Scores your finances across 4 key metrics | ✅ Done |
-| 3 — AI Narrative Story | AI tells the story of your money | 🔄 In Progress |
-| 4 — Contextual Education | Explains why the diagnosed issues matter | ⏳ Pending |
-| 5 — The One Next Step | One clear, actionable recommendation | ⏳ Pending |
+| 3 — AI Narrative Story | AI tells the story of your money | ✅ Done |
+| 4 — Contextual Education | Explains why the diagnosed issues matter | ✅ Done |
+| 5 — The One Next Step | Lives inside narrative Q4 | ✅ Done |
 
 ---
 
@@ -46,7 +46,7 @@ App gives you ONE clear next step
 
 ### Prerequisites
 - Python 3.9 or higher
-- An API key from Anthropic, OpenAI, or Groq
+- An API key from Anthropic, OpenAI, Groq, or Gemini
 
 ### Install dependencies
 ```bash
@@ -69,15 +69,19 @@ Open your browser at `http://localhost:8501`
 finfriend/
 ├── requirements.txt
 ├── README.md
-├── SUMMARY.md
-├── TODO.md
+├── DECISIONS.md              # Product thinking and design decisions
+├── summary.md                # Full development summary
+├── TODO.md                   # Feature backlog
 └── app/
-    ├── main.py               # Panel switching
+    ├── main.py               # Panel switching + session state
     └── modules/
         ├── snapshot.py       # Module 1: form data collection
-        ├── health.py         # Module 2: calculations
+        ├── health.py         # Module 2: scoring calculations
+        ├── narrative.py      # Module 3: LLM prompt + streaming
+        ├── education.py      # Module 4: contextual education
+        ├── simulator.py      # What-If Simulator
         ├── panel_form.py     # Panel 1 UI
-        └── panel_results.py  # Panel 2 UI
+        └── panel_results.py  # Panel 2 UI (tabs: story, simulator, ask)
 ```
 
 ---

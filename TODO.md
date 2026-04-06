@@ -18,8 +18,8 @@ Each entry: what + why | files touched | priority | done
 
 | # | Feature | What + Why | Files | Done |
 |---|---------|------------|-------|------|
-| 1 | **Form Framing Change** | Change all expense inputs from asking for precision to asking for estimates. Add a note at the top: "Estimates are fine — rough numbers are better than 0. Check your bank app's monthly summary if unsure." Directly unblocks users who don't track spending. | `snapshot.py`, `panel_form.py` | ⬜ |
-| 3 | **What-If Simulator** | Sliders on the results page: "What if I cut dining by $200/month?" → score recalculates live. Pure math, no AI, no storage. Highly engaging — users see immediately how spending choices affect their score. Turns FinFriend from a read-only report into an interactive tool. | `panel_results.py`, `health.py` | ⬜ |
+| 1 | **Form Framing Change** | Change all expense inputs from asking for precision to asking for estimates. Add a note at the top: "Estimates are fine — rough numbers are better than 0. Check your bank app's monthly summary if unsure." Directly unblocks users who don't track spending. | `snapshot.py`, `panel_form.py` | ✅ |
+| 3 | **What-If Simulator** | Sliders on the results page: "What if I cut dining by $200/month?" → score recalculates live. Pure math, no AI, no storage. Highly engaging — users see immediately how spending choices affect their score. Turns FinFriend from a read-only report into an interactive tool. | `panel_results.py`, `health.py` | ✅ |
 | 4 | **Decision Helper** | Chat input at the bottom of the results panel: "I got a $600 raise — what should I do with it?" or "Should I take this car loan?" The AI already has full financial context from the session. Mostly a prompt change. Users return every time they face a financial decision. | `panel_results.py`, `narrative.py` | ⬜ |
 
 ---
@@ -70,10 +70,17 @@ Each entry: what + why | files touched | priority | done
 | # | Feature | Done |
 |---|---------|------|
 | — | **Expense Benchmark Hints** | ✅ |
+| — | **Form Framing Change** | ✅ |
+| — | **What-If Simulator** | ✅ |
 | — | **Module 1: Financial Snapshot** | ✅ |
 | — | **Module 2: Health Score + Mirror** | ✅ |
 | — | **Module 3: AI Narrative** | ✅ |
 | — | **Module 4: Contextual Education** | ✅ |
+| — | **Results page tabs** (Story / What If? / Ask FinFriend) + narrative caching | ✅ |
+| — | **Expense breakdown chart** (Plotly horizontal bar, % of income, 30% reference line) | ✅ |
+| — | **Debt payment missing flag** (debt > 0 + monthly payment = 0 → danger score + narrative warning) | ✅ |
+| — | **Minimum expense floors in prompt** (AI won't suggest cuts below per-category minimums) | ✅ |
+| — | **Simulator metric tooltips** (each slider explains metric definition, target benchmark, what affects it) | ✅ |
 
 ---
 

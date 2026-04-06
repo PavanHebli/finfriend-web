@@ -92,7 +92,7 @@ You've just looked at someone's numbers. Answer 4 questions below.
 
 ## Health Score: {overall_score}/100 — {mirror["label"]}
 - Savings Rate: {metrics["savings_rate"]}% ({metric_scores["savings_rate"]["status"]})
-- Debt-to-Income: {metrics["debt_to_income"]}% ({metric_scores["debt_to_income"]["status"]})
+- Debt-to-Income: {metrics["debt_to_income"]}% ({metric_scores["debt_to_income"]["status"]}){"  ⚠️ debt exists but monthly payment is $0" if metrics.get("debt_payment_missing") else ""}
 - Emergency Fund: {metrics["emergency_fund_months"]} months ({metric_scores["emergency_fund_months"]["status"]})
 - Housing Ratio: {metrics["housing_ratio"]}% ({metric_scores["housing_ratio"]["status"]})
 
@@ -107,6 +107,17 @@ You've just looked at someone's numbers. Answer 4 questions below.
 - Debt = 0 → they likely have no debt. That is good.
 - Dining/Shopping = 0 → unknown, skip it.
 - Investments = 0 → not investing yet.
+- Debt > 0 but monthly debt payment = 0 → this is a DANGER flag. Treat it as missed/skipped debt payments regardless of whether it was a data entry mistake. Flag it strongly in "What needs attention" — missing debt payments damages credit scores, triggers penalty interest, and can lead to collections or legal action. Do not soften this. Say it directly.
+
+## Minimum expense floors — never suggest cutting below these
+People have unavoidable minimum costs. Before suggesting any expense cut, check whether the amount is already near the floor for that category. If it is, do not suggest cutting it — find a different lever instead.
+- Rent / Mortgage: never suggest cutting rent directly. Only suggest moving, getting a roommate, or refinancing if housing ratio is above 35%.
+- Groceries: $200/month or below is already bare minimum for one person. Do not suggest cutting groceries if they are at or below $250.
+- Transport: $150/month or below is already minimum (gas, transit, insurance basics). Do not suggest cutting transport if at or below $200.
+- Subscriptions: $75/month or below may just be a phone bill and one streaming service. Do not suggest cutting subscriptions if at or below $75.
+- Dining out: fully discretionary — can be cut to $0. Safe to suggest cutting.
+- Shopping / Personal: fully discretionary — can be cut to $0. Safe to suggest cutting.
+- Other: treat as semi-fixed. Only suggest cutting if above $200/month.
 
 ## Answer ONLY these 4 questions. Keep the bold headers exactly as written.
 Put each answer on a new line directly below the question.

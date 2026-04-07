@@ -7,6 +7,7 @@ def render_api_config():
     Allows user to select LLM provider and enter API key.
     """
     st.subheader("AI Configuration")
+    st.caption("Don't have an API key? [Get one here →](/get_api_key)")
     
     col1, col2 = st.columns([1, 2])
     

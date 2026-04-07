@@ -81,6 +81,11 @@ def render_form_panel():
             st.error("Please enter an API key to continue.")
         elif st.session_state.income_main == 0:
             st.error("Please enter your monthly income to continue.")
+        elif st.session_state.debt_monthly > 0 and st.session_state.debt_total == 0:
+            st.error(
+                f"Monthly debt payment is ${st.session_state.debt_monthly:,.0f} but total debt is $0. "
+                "Either enter your total debt balance or set the monthly payment to $0."
+            )
         else:
             st.session_state.current_page = "results"
             st.rerun()

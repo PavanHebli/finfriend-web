@@ -5,7 +5,7 @@ from modules.panel_results import render_results_panel
 
 def init_session_state():
     defaults = {
-        "llm_provider": "anthropic",
+        "llm_provider": "groq",
         "api_key": "",
         "income_main": 0.0,
         "income_additional": 0.0,
@@ -38,7 +38,8 @@ def main():
     st.set_page_config(
         page_title="FinFriend",
         page_icon="💰",
-        layout="wide"
+        layout="wide",
+        initial_sidebar_state="collapsed"
     )
 
     init_session_state()

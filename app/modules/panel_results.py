@@ -1,10 +1,12 @@
 import streamlit as st
 import plotly.graph_objects as go
+from datetime import datetime
 from modules.health import calculate_metrics, score_metrics, calculate_overall_score, get_mirror_label
 from modules.narrative import build_prompt, call_llm
 from modules.education import render_education
 from modules.simulator import render_whatif_simulator
 from modules.storage import create_snapshot, append_or_overwrite, to_finfd
+from modules.progress import render_progress
 
 
 _SIM_KEYS = ["sim_income", "sim_dining", "sim_shopping", "sim_subscriptions", "sim_debt_payment"]
@@ -233,7 +235,7 @@ def render_results_panel():
     render_expense_chart(st.session_state, metrics, metric_scores)
     st.markdown("---")
 
-    tab1, tab2, tab3 = st.tabs(["Your Financial Story", "What If?", "Ask FinFriend"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Your Financial Story", "What If?", "Progress", "FinFriend Chat"])
 
     with tab1:
         st.markdown(
@@ -262,8 +264,21 @@ def render_results_panel():
         render_whatif_simulator(overall_score, metric_scores)
 
     with tab3:
+        current_snapshot = {
+            "saved_at": datetime.now().strftime("%Y-%m"),
+            "outputs": {
+                "overall_score": overall_score,
+                "mirror_label":  mirror["label"],
+                "metrics":       metrics,
+                "metric_scores": metric_scores,
+                "narrative":     st.session_state.get("narrative_text", ""),
+            },
+        }
+        render_progress(st.session_state.get("loaded_snapshots", []), current_snapshot)
+
+    with tab4:
         st.info(
-            "**Decision Helper coming soon.** "
-            "You'll be able to ask FinFriend questions like 'I got a raise — what should I do with it?' "
-            "or 'Should I pay off debt or invest first?' — answered with your actual numbers as context."
+            "**FinFriend Chat coming soon.**  \n"
+            "Ask scenario questions, get progress coaching, and get insurance guidance — "
+            "all answered using your actual numbers."
         )

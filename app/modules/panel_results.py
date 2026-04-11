@@ -282,3 +282,6 @@ def render_results_panel():
             "Ask scenario questions, get progress coaching, and get insurance guidance — "
             "all answered using your actual numbers."
         )
+
+    st.markdown("---")
+    st.page_link("pages/feedback.py", label="How was your experience? Share feedback →", icon="💬")

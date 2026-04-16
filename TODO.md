@@ -29,8 +29,8 @@ Each entry: what + why | files touched | priority | done
 | Phase | What | Files | Done |
 |-------|------|-------|------|
 | 5a | **Base prompt + guardrails + chat UI** | `chat.py`, `panel_results.py` | ✅ |
-| 5b | **LLM classifier** — fast cheap call to classify question into: `debt`, `savings`, `housing`, `insurance`, `score`, `scenario`, `general` | `chat.py` | ⬜ |
-| 5c | **Category-specific prompts** — 7 prompts (including scenario), each injecting relevant user metrics. All share base system prompt as foundation. | `chat.py` | ⬜ |
+| 5b | **LLM classifier** — fast call, NO base system prompt (saves ~800 tokens). Returns 1–2 categories: `debt`, `savings`, `housing`, `insurance`, `score`, `scenario`, `app`, `emotional`, `general`. Two categories returned as `"debt, emotional"` etc. 3+ topics → `general`. | `chat.py` | ⬜ |
+| 5c | **Category-specific prompts** — 9 prompt blocks injected on top of base prompt. `emotional` is both a standalone category and a modifier. `app` block contains full FinFriend feature knowledge. `scenario` block routes to tool calls (Phase 5e). | `chat.py` | ⬜ |
 | 5d | **Conversation summarisation** — rolling summary after 8 turns. Snapshot context always injected, never dropped. | `chat.py` | ⬜ |
 | 5e | **Tool calls — What-If from chat** — chat detects scenario questions, calls `calculate_metrics()` + `score_metrics()` with modified inputs, returns real calculated score delta. Replaces LLM estimation with actual math. | `chat.py`, `health.py` | ⬜ |
 | 5f | **Cognitive offload handling** — when user says "you decide" / "you pick" / "give me your best guess", model uses snapshot anchors + standard financial rules of thumb (28% housing rule, 80% income for freelance estimate etc.) to fill in missing variables, then calls tool. Reasoning and tool call are one step — reasoning decides the estimate, tool validates with real math. | `chat.py` | ⬜ |

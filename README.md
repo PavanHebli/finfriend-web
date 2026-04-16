@@ -34,7 +34,8 @@ Save your snapshot → track progress month over month
 | What-If Simulator | Sliders to explore how changes affect your score | ✅ |
 | Snapshot Save / Load | Save progress as encrypted `.fin` file, load next month | ✅ |
 | Progress Charts | Score and metric trends across months — merges saved history with current session | ✅ |
-| FinFriend Chat | Finance-only chat: scenario planning, progress coaching, insurance guidance | 🔜 |
+| FinFriend Chat | Friend-tone finance chat — grounded in your actual numbers, guardrailed, streaming | ✅ |
+| Feedback | In-app feedback form with Supabase backend | ✅ |
 
 ---
 
@@ -85,7 +86,8 @@ finfriend/
 └── app/
     ├── main.py               # Page config + session state init + panel routing
     ├── pages/
-    │   └── get_api_key.py    # Step-by-step API key guide (all 4 providers)
+    │   ├── get_api_key.py    # Step-by-step API key guide (all 4 providers)
+    │   └── feedback.py       # Feedback form → Supabase
     └── modules/
         ├── snapshot.py       # Module 1: form section render functions
         ├── health.py         # Module 2: pure scoring logic (no Streamlit)
@@ -94,6 +96,8 @@ finfriend/
         ├── simulator.py      # What-If Simulator: sliders + live recalculation
         ├── storage.py        # Snapshot schema, Fernet encryption, .fin I/O
         ├── progress.py       # Progress Charts: merge history + current, render charts
+        ├── chat.py           # FinFriend Chat: prompt, guardrails, classifier, streaming
+        ├── feedback_db.py    # Supabase client + submit_feedback()
         ├── panel_form.py     # Panel 1 UI: form, toggle, import snapshot
         └── panel_results.py  # Panel 2 UI: score, breakdown, 4 tabs
 ```

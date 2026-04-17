@@ -10,7 +10,7 @@ SNAPSHOT_VERSION = "1"
 # App-level encryption key — protects against accidental exposure.
 # Not password-based: zero user friction, guards against casual snooping.
 # 32 bytes → base64url-encoded → valid Fernet key.
-_RAW_KEY    = b'finfriend_secret_key_v1_2026_!!!'  # exactly 32 bytes
+_RAW_KEY    = b'vitals__secret_key_v1___2026_!!!'  # exactly 32 bytes
 _FERNET_KEY = base64.urlsafe_b64encode(_RAW_KEY)
 _cipher     = Fernet(_FERNET_KEY)
 
@@ -44,9 +44,9 @@ def create_snapshot(state: dict, metrics: dict, metric_scores: dict, overall_sco
     }
 
 
-def load_finfd(uploaded_file) -> list:
+def load_vit(uploaded_file) -> list:
     """
-    Decrypts and parses an uploaded .finfd file into a list of snapshots.
+    Decrypts and parses an uploaded .vit file into a list of snapshots.
     Handles both array format (normal) and single-object format (legacy).
     Raises ValueError with a user-friendly message if decryption fails.
     """
@@ -58,7 +58,7 @@ def load_finfd(uploaded_file) -> list:
             content = [content]
         return content
     except Exception:
-        raise ValueError("Could not read this file. Make sure it's a valid FinFriend (.finfd) snapshot.")
+        raise ValueError("Could not read this file. Make sure it's a valid Vitals (.vit) snapshot.")
 
 
 def append_or_overwrite(snapshots: list, new_snapshot: dict) -> list:
@@ -81,8 +81,8 @@ def get_latest(snapshots: list) -> dict:
     return snapshots[-1]
 
 
-def to_finfd(snapshots: list) -> bytes:
-    """Serializes and encrypts a snapshot list into .finfd bytes."""
+def to_vit(snapshots: list) -> bytes:
+    """Serializes and encrypts a snapshot list into .vit bytes."""
     json_str = json.dumps(snapshots, indent=2)
     return _cipher.encrypt(json_str.encode("utf-8"))
 

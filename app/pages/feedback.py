@@ -2,7 +2,7 @@ import streamlit as st
 from modules.feedback_db import submit_feedback
 
 st.set_page_config(
-    page_title="Feedback — FinFriend",
+    page_title="Feedback — Vitals",
     page_icon="💬",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -10,7 +10,7 @@ st.set_page_config(
 
 st.title("💬 Share Your Feedback")
 st.markdown(
-    "FinFriend is built in the open. Your feedback directly shapes what gets built next. "
+    "Vitals is built in the open. Your feedback directly shapes what gets built next. "
     "This takes about 2 minutes."
 )
 st.markdown("---")
@@ -23,7 +23,7 @@ LIMIT_SHORT = 300
 LIMIT_LONG  = 2000
 
 found_via = st.selectbox(
-    "How did you find FinFriend?",
+    "How did you find Vitals?",
     ["Reddit", "Friend / word of mouth", "Google", "GitHub", "Other"],
 )
 found_via_other = ""

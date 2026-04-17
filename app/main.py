@@ -41,8 +41,8 @@ def init_session_state():
 
 def main():
     st.set_page_config(
-        page_title="FinFriend",
-        page_icon="💰",
+        page_title="Vitals",
+        page_icon="🩺",
         layout="wide",
         initial_sidebar_state="collapsed"
     )

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Decrypt and inspect a .fin snapshot file.
+Decrypt and inspect a .vit snapshot file.
 
 Usage:
-    python tests/decrypt_finfd.py path/to/my_finances.fin
-    python tests/decrypt_finfd.py path/to/my_finances.fin --full
+    python tests/decrypt_finfd.py path/to/my_vitals.vit
+    python tests/decrypt_finfd.py path/to/my_vitals.vit --full
 """
 
 import sys
@@ -13,14 +13,14 @@ import base64
 
 from cryptography.fernet import Fernet
 
-_RAW_KEY    = b'finfriend_secret_key_v1_2026_!!!'
+_RAW_KEY    = b'vitals__secret_key_v1___2026_!!!'
 _FERNET_KEY = base64.urlsafe_b64encode(_RAW_KEY)
 _cipher     = Fernet(_FERNET_KEY)
 
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python tests/decrypt_finfd.py <file.finfd> [--full]")
+        print("Usage: python tests/decrypt_finfd.py <file.vit> [--full]")
         sys.exit(1)
 
     path     = sys.argv[1]
@@ -32,7 +32,7 @@ def main():
     try:
         json_str = _cipher.decrypt(encrypted).decode("utf-8")
     except Exception:
-        print("ERROR: Could not decrypt. Is this a valid .finfd file?")
+        print("ERROR: Could not decrypt. Is this a valid .vit file?")
         sys.exit(1)
 
     data = json.loads(json_str)
@@ -40,7 +40,7 @@ def main():
         data = [data]
 
     print(f"\n{'='*50}")
-    print(f"  FinFriend Snapshot — {len(data)} entry/entries")
+    print(f"  Vitals Snapshot — {len(data)} entry/entries")
     print(f"{'='*50}\n")
 
     for i, snap in enumerate(data):

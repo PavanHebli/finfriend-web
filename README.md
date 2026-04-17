@@ -1,15 +1,15 @@
-# FinFriend
+# Vitals
 
-An open source personal finance app that scores your financial health, narrates your money story, and tracks your progress over time.
+A 5-minute monthly financial health checkup. No bank connection. No account. Just your numbers and an honest score.
 
-**Live app:** https://finfriend-web.streamlit.app/
+**Live app:** https://finfriend-web.streamlit.app/ ← update after Streamlit app rename
 
 ---
 
 ## What it does
 
 ```
-You input your financial data
+You enter your rough monthly numbers (5 min)
         ↓
 App scores your financial health (0–100)
         ↓
@@ -32,9 +32,9 @@ Save your snapshot → track progress month over month
 | Contextual Education | Explains why flagged metrics matter | ✅ |
 | Expense Chart | Horizontal bar chart — each category as % of income | ✅ |
 | What-If Simulator | Sliders to explore how changes affect your score | ✅ |
-| Snapshot Save / Load | Save progress as encrypted `.fin` file, load next month | ✅ |
+| Snapshot Save / Load | Save progress as encrypted `.vit` file, load next month | ✅ |
 | Progress Charts | Score and metric trends across months — merges saved history with current session | ✅ |
-| FinFriend Chat | Friend-tone finance chat — grounded in your actual numbers, guardrailed, streaming | ✅ |
+| Vitals Chat | Friend-tone finance chat — grounded in your actual numbers, guardrailed, streaming | ✅ |
 | Feedback | In-app feedback form with Supabase backend | ✅ |
 
 ---
@@ -44,7 +44,7 @@ Save your snapshot → track progress month over month
 - **Python** 3.9+
 - **Streamlit** — UI framework
 - **Plotly** — charts
-- **Cryptography (Fernet)** — `.fin` file encryption
+- **Cryptography (Fernet)** — `.vit` file encryption
 - **LLM Providers** — Anthropic, OpenAI, Groq (default — free tier), Gemini
 
 **User brings their own API key.** Don't have one? See the [Get API Key](/get_api_key) page inside the app.
@@ -75,14 +75,15 @@ Open `http://localhost:8501`
 ## Project Structure
 
 ```
-finfriend/
+vitals/
 ├── requirements.txt
 ├── README.md
 ├── DECISIONS.md              # Product thinking and design rationale
 ├── TODO.md                   # Prioritised feature backlog
 ├── tests/
-│   ├── decrypt_finfd.py      # CLI utility to decrypt + inspect .fin files
-│   └── generate_fake_data.py # Generates a 6-month fake .fin file for testing
+│   ├── decrypt_finfd.py      # CLI utility to decrypt + inspect .vit files
+│   ├── generate_fake_data.py # Generates a 6-month fake .vit file for testing
+│   └── test_classifier.py    # Classifier unit tests — runs without Streamlit
 └── app/
     ├── main.py               # Page config + session state init + panel routing
     ├── pages/
@@ -94,9 +95,9 @@ finfriend/
         ├── narrative.py      # Module 3: LLM prompt + streaming (4 providers)
         ├── education.py      # Module 4: contextual education content
         ├── simulator.py      # What-If Simulator: sliders + live recalculation
-        ├── storage.py        # Snapshot schema, Fernet encryption, .fin I/O
+        ├── storage.py        # Snapshot schema, Fernet encryption, .vit I/O
         ├── progress.py       # Progress Charts: merge history + current, render charts
-        ├── chat.py           # FinFriend Chat: prompt, guardrails, classifier, streaming
+        ├── chat.py           # Vitals Chat: prompt, guardrails, classifier, streaming
         ├── feedback_db.py    # Supabase client + submit_feedback()
         ├── panel_form.py     # Panel 1 UI: form, toggle, import snapshot
         └── panel_results.py  # Panel 2 UI: score, breakdown, 4 tabs
@@ -106,12 +107,12 @@ finfriend/
 
 ## Snapshot file format
 
-FinFriend saves your data as an encrypted `.fin` file (`my_finances.fin`). The file contains all your monthly snapshots — one entry per month, with inputs, scores, metrics, and AI narrative. Re-downloading overwrites the previous file — one file for everything.
+Vitals saves your data as an encrypted `.vit` file (`my_vitals.vit`). The file contains all your monthly snapshots — one entry per month, with inputs, scores, metrics, and AI narrative. Re-downloading overwrites the previous file — one file for everything.
 
 To inspect a snapshot file from the command line:
 ```bash
-python tests/decrypt_finfd.py path/to/my_finances.fin
-python tests/decrypt_finfd.py path/to/my_finances.fin --full
+python tests/decrypt_finfd.py path/to/my_vitals.vit
+python tests/decrypt_finfd.py path/to/my_vitals.vit --full
 ```
 
 To generate fake test data for the Progress Charts tab:

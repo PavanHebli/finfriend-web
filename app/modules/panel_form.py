@@ -1,7 +1,7 @@
 import random
 import streamlit as st
 from modules.snapshot import render_api_config, render_income_section, render_expenses_section, render_position_section, render_context_section
-from modules.storage import load_finfd, get_latest, populate_state_from_snapshot
+from modules.storage import load_vit, get_latest, populate_state_from_snapshot
 
 
 def fill_sample_data():
@@ -44,8 +44,8 @@ def clear_all_fields():
 def render_form_panel():
     col1, col2, col3 = st.columns([5, 1.5, 1])
     with col1:
-        st.title("💰 FinFriend")
-        st.markdown("### Your Personal Financial Health Assistant")
+        st.title("🩺 Vitals")
+        st.markdown("### Your Personal Financial Health Checkup")
     with col2:
         st.markdown("<br>", unsafe_allow_html=True)
         previous = st.session_state.get("sample_input_active", False)
@@ -64,15 +64,15 @@ def render_form_panel():
 
     # --- Import previous snapshot ---
     uploaded = st.file_uploader(
-        "Import previous data (my_finances.fin)",
-        type=["fin"],
+        "Import previous data (my_vitals.vit)",
+        type=["vit"],
         key=f"snapshot_upload_{st.session_state.get('file_uploader_key', 0)}",
         label_visibility="visible",
     )
 
     if uploaded and "snapshot_preview_data" not in st.session_state:
         try:
-            st.session_state.snapshot_preview_data = load_finfd(uploaded)
+            st.session_state.snapshot_preview_data = load_vit(uploaded)
         except ValueError as e:
             st.error(str(e))
 

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Generates a fake 6-month .fin file for testing the Progress Charts tab.
+Generates a fake 6-month .vit file for testing the Progress Charts tab.
 Shows a realistic improvement arc — user starts struggling, gradually gets better.
 
 Usage:
     python tests/generate_fake_data.py
-    # Outputs: tests/fake_data.fin
+    # Outputs: tests/fake_data.vit
 """
 
 import sys
@@ -15,7 +15,7 @@ import json
 
 from cryptography.fernet import Fernet
 
-_RAW_KEY    = b'finfriend_secret_key_v1_2026_!!!'
+_RAW_KEY    = b'vitals__secret_key_v1___2026_!!!'
 _FERNET_KEY = base64.urlsafe_b64encode(_RAW_KEY)
 _cipher     = Fernet(_FERNET_KEY)
 
@@ -210,7 +210,7 @@ SNAPSHOTS = [
 
 
 def main():
-    output_path = os.path.join(os.path.dirname(__file__), "fake_data.fin")
+    output_path = os.path.join(os.path.dirname(__file__), "fake_data.vit")
     json_str    = json.dumps(SNAPSHOTS, indent=2)
     encrypted   = _cipher.encrypt(json_str.encode("utf-8"))
 

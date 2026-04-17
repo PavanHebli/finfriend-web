@@ -5,12 +5,12 @@ from modules.health import calculate_metrics, score_metrics, calculate_overall_s
 from modules.narrative import build_prompt, call_llm
 from modules.education import render_education
 from modules.simulator import render_whatif_simulator
-from modules.storage import create_snapshot, append_or_overwrite, to_finfd
+from modules.storage import create_snapshot, append_or_overwrite, to_vit
 from modules.progress import render_progress
 from modules.chat import (
     is_out_of_scope, _OUT_OF_SCOPE_RESPONSE,
     STARTER_QUESTIONS, build_snapshot_context,
-    build_messages, call_llm_chat,
+    build_messages, call_llm_chat, classify_question,
 )
 
 
@@ -204,8 +204,8 @@ def render_results_panel():
         )
         st.download_button(
             "💾 Save snapshot",
-            data=to_finfd(snapshots),
-            file_name="my_finances.fin",
+            data=to_vit(snapshots),
+            file_name="my_vitals.vit",
             mime="application/octet-stream",
             type="secondary",
         )
@@ -240,7 +240,7 @@ def render_results_panel():
     render_expense_chart(st.session_state, metrics, metric_scores)
     st.markdown("---")
 
-    tab1, tab2, tab3, tab4 = st.tabs(["Your Financial Story", "What If?", "Progress", "FinFriend Chat"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Your Financial Story", "What If?", "Progress", "Vitals Chat"])
 
     with tab1:
         st.markdown(
@@ -334,13 +334,19 @@ def render_results_panel():
                 st.session_state.chat_history.append({"role": "assistant", "content": _OUT_OF_SCOPE_RESPONSE})
                 st.rerun()
             else:
+                categories = classify_question(
+                    pending_message,
+                    st.session_state.llm_provider,
+                    st.session_state.api_key,
+                )
                 snapshot_context = build_snapshot_context(
                     dict(st.session_state), metrics, metric_scores, overall_score, mirror
                 )
                 messages = build_messages(
                     snapshot_context,
                     st.session_state.chat_history,
-                    st.session_state.get("chat_summary", ""),
+                    categories=categories,
+                    summarised_history=st.session_state.get("chat_summary", ""),
                 )
                 try:
                     with chat_container:

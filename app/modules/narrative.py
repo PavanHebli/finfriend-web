@@ -69,7 +69,7 @@ def build_prompt(state, metrics, metric_scores, overall_score, mirror) -> str:
     )
 
     return f"""
-You are FinFriend — a brutally honest financial friend.
+You are Vitals — a brutally honest financial health checker.
 You've just looked at someone's numbers. Answer 4 questions below.
 
 ## Their Numbers

@@ -11,6 +11,7 @@ from modules.chat import (
     is_out_of_scope, _OUT_OF_SCOPE_RESPONSE,
     STARTER_QUESTIONS, build_snapshot_context,
     build_messages, call_llm_chat, classify_question,
+    maybe_summarise,
 )
 
 
@@ -312,7 +313,7 @@ def render_results_panel():
         chat_container = st.container(height=480)
         with chat_container:
             for msg in st.session_state.chat_history:
-                avatar = "🧑" if msg["role"] == "user" else "💰"
+                avatar = "🧑" if msg["role"] == "user" else "🩺"
                 with st.chat_message(msg["role"], avatar=avatar):
                     st.markdown(msg["content"].replace("$", "\\$"))
 
@@ -350,13 +351,22 @@ def render_results_panel():
                 )
                 try:
                     with chat_container:
-                        with st.chat_message("assistant", avatar="💰"):
+                        with st.chat_message("assistant", avatar="🩺"):
                             response = st.write_stream(call_llm_chat(
                                 messages,
                                 st.session_state.llm_provider,
                                 st.session_state.api_key,
                             ))
                     st.session_state.chat_history.append({"role": "assistant", "content": response})
+                    # Phase 5d: summarise older turns if threshold reached
+                    updated_history, updated_summary = maybe_summarise(
+                        st.session_state.chat_history,
+                        st.session_state.get("chat_summary", ""),
+                        st.session_state.llm_provider,
+                        st.session_state.api_key,
+                    )
+                    st.session_state.chat_history = updated_history
+                    st.session_state.chat_summary = updated_summary
                 except Exception as e:
                     st.error(f"Could not get a response: {e}")
                 st.rerun()

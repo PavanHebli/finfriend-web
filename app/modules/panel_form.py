@@ -42,7 +42,7 @@ def clear_all_fields():
 
 
 def render_form_panel():
-    col1, col2, col3 = st.columns([5, 1.5, 1])
+    col1, col2, col3, col4 = st.columns([5, 1.5, 1, 1])
     with col1:
         st.title("🩺 Vitals")
         st.markdown("### Your Personal Financial Health Checkup")
@@ -59,6 +59,9 @@ def render_form_panel():
         st.markdown("<br>", unsafe_allow_html=True)
         if st.button("Clear all", type="secondary"):
             clear_all_fields()
+    with col4:
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("<span style='font-size:1.2rem'>[💬 Feedback](/feedback)</span>", unsafe_allow_html=True)
 
     st.markdown("---")
 

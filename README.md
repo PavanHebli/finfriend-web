@@ -2,7 +2,7 @@
 
 A 5-minute monthly financial health checkup. No bank connection. No account. Just your numbers and an honest score.
 
-**Live app:** https://finfriend-web.streamlit.app/ ← update after Streamlit app rename
+**Live app:** https://myfinance-vitals.streamlit.app/
 
 ---
 
@@ -47,7 +47,7 @@ Save your snapshot → track progress month over month
 - **Cryptography (Fernet)** — `.vit` file encryption
 - **LLM Providers** — Anthropic, OpenAI, Groq (default — free tier), Gemini
 
-**User brings their own API key.** Don't have one? See the [Get API Key](/get_api_key) page inside the app.
+**User brings their own API key.** Don't have one? See the [Get API Key](https://myfinance-vitals.streamlit.app/get_api_key) page inside the app.
 
 ---
 

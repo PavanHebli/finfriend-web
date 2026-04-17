@@ -433,7 +433,7 @@ def classify_question(message: str, provider: str, api_key: str) -> list[str]:
         categories.append(result.secondary)
 
     # DEV: print classifier output to terminal for testing
-    print(f"[CLASSIFIER] '{message[:80]}' → {categories}")
+    # print(f"[CLASSIFIER] '{message[:80]}' → {categories}")
 
     return categories
 
@@ -690,3 +690,109 @@ def build_messages(
     messages = [{"role": "system", "content": system_content}]
     messages.extend(chat_history)
     return messages
+
+
+# ---------------------------------------------------------------------------
+# Phase 5d — Conversation summarisation
+# Triggers after 8 new turns accumulate beyond the 6 kept verbatim.
+# Snapshot context is always injected separately — never summarised.
+# ---------------------------------------------------------------------------
+
+_SUMMARISE_PROMPT = """Summarise the following personal finance conversation for context continuity.
+{existing_block}
+Conversation to summarise:
+{conversation}
+
+Write a concise summary under 150 words covering:
+- Main topics discussed
+- Specific numbers, decisions, or conclusions reached
+- The user's concerns or goals as they emerged
+
+Do not include the user's financial snapshot (income, score, metrics) — that is always provided separately.
+Return only the summary text, no headers or labels."""
+
+
+def _call_llm_simple(prompt: str, provider: str, api_key: str) -> str:
+    """Non-streaming single-turn LLM call. Returns the response as a string."""
+    if provider == "anthropic":
+        import anthropic
+        client = anthropic.Anthropic(api_key=api_key)
+        resp = client.messages.create(
+            model="claude-opus-4-6",
+            max_tokens=300,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return resp.content[0].text
+
+    elif provider == "openai":
+        from openai import OpenAI
+        resp = OpenAI(api_key=api_key).chat.completions.create(
+            model="gpt-4o",
+            max_tokens=300,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return resp.choices[0].message.content
+
+    elif provider == "groq":
+        from groq import Groq
+        resp = Groq(api_key=api_key).chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            max_tokens=300,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return resp.choices[0].message.content
+
+    elif provider == "gemini":
+        import google.generativeai as genai
+        genai.configure(api_key=api_key)
+        resp = genai.GenerativeModel("gemini-1.5-flash").generate_content(prompt)
+        return resp.text
+
+    return ""
+
+
+def _summarise_turns(turns: list, existing_summary: str, provider: str, api_key: str) -> str:
+    """Calls the LLM to summarise a list of turns into a short text block."""
+    conversation = "\n".join(
+        f"{m['role'].upper()}: {m['content']}" for m in turns
+    )
+    existing_block = (
+        f"Existing summary to extend:\n{existing_summary}\n\nNew turns to add:"
+        if existing_summary else ""
+    )
+    prompt = _SUMMARISE_PROMPT.format(
+        existing_block=existing_block,
+        conversation=conversation,
+    )
+    try:
+        return _call_llm_simple(prompt, provider, api_key)
+    except Exception:
+        return existing_summary  # on failure, keep what we had
+
+
+def maybe_summarise(
+    chat_history: list,
+    existing_summary: str,
+    provider: str,
+    api_key: str,
+    keep_turns: int = 6,
+    summarise_after_turns: int = 8,
+) -> tuple[list, str]:
+    """
+    Checks whether summarisation is needed and runs it if so.
+    Returns (updated_chat_history, updated_summary).
+
+    Triggers when len(chat_history) >= (keep_turns + summarise_after_turns) * 2.
+    On trigger: summarises chat_history[:-keep_turns*2], keeps chat_history[-keep_turns*2:].
+    Snapshot context is always injected separately — never included here.
+    """
+    threshold = (keep_turns + summarise_after_turns) * 2  # default: 28
+    if len(chat_history) < threshold:
+        return chat_history, existing_summary
+
+    keep_count  = keep_turns * 2          # 12 messages
+    to_summarise = chat_history[:-keep_count]
+    to_keep      = chat_history[-keep_count:]
+
+    new_summary = _summarise_turns(to_summarise, existing_summary, provider, api_key)
+    return to_keep, new_summary

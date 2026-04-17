@@ -14,7 +14,7 @@ col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     st.markdown("#### Groq")
-    st.success("✅ Recommended")
+    st.success("✅ Free tier available")
     st.markdown("""
 - **Free tier:** Yes — no credit card
 - **Model:** Llama 3.3 70B

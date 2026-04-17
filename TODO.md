@@ -31,7 +31,7 @@ Each entry: what + why | files touched | priority | done
 | 5a | **Base prompt + guardrails + chat UI** | `chat.py`, `panel_results.py` | ✅ |
 | 5b | **LLM classifier** — fast call, NO base system prompt (saves ~800 tokens). Returns 1–2 categories: `debt`, `savings`, `housing`, `insurance`, `score`, `scenario`, `app`, `emotional`, `general`. Pydantic-validated structured output per provider. | `chat.py` | ✅ |
 | 5c | **Category-specific prompts** — 9 prompt blocks injected on top of base prompt. `emotional` is both a standalone category and a modifier. `app` block contains full Vitals feature knowledge. `scenario` block has scoring thresholds inlined for accurate what-if reasoning. | `chat.py` | ✅ |
-| 5d | **Conversation summarisation** — rolling summary after 8 turns. Snapshot context always injected, never dropped. | `chat.py` | ⬜ |
+| 5d | **Conversation summarisation** — rolling summary after 8 turns. Snapshot context always injected, never dropped. | `chat.py` | ✅ |
 | 5e | **Tool calls — What-If from chat** — chat detects scenario questions, calls `calculate_metrics()` + `score_metrics()` with modified inputs, returns real calculated score delta. Replaces LLM estimation with actual math. | `chat.py`, `health.py` | ⬜ |
 | 5f | **Cognitive offload handling** — when user says "you decide" / "you pick" / "give me your best guess", model uses snapshot anchors + standard financial rules of thumb (28% housing rule, 80% income for freelance estimate etc.) to fill in missing variables, then calls tool. Reasoning and tool call are one step — reasoning decides the estimate, tool validates with real math. | `chat.py` | ⬜ |
 
@@ -109,6 +109,7 @@ Each entry: what + why | files touched | priority | done
 | Vitals Chat Phase 5a — base prompt + guardrails + chat UI | ✅ |
 | Vitals Chat Phase 5b — LLM classifier with Pydantic structured output | ✅ |
 | Vitals Chat Phase 5c — 9 category-specific prompt blocks | ✅ |
+| Vitals Chat Phase 5d — conversation summarisation (8 turns, keep 6 verbatim) | ✅ |
 | Rebrand from FinFriend → Vitals (.vit file format, 🩺 icon) | ✅ |
 
 ---

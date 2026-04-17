@@ -58,7 +58,7 @@ A single generic prompt was considered and rejected. A generic prompt hedges acr
 
 **No external framework.** The tools are local Python functions in `health.py`. Native tool calling via each provider's SDK handles this — no LangChain, LlamaIndex, or LangGraph needed. All four providers support native tool calling. The framework is `chat.py` itself.
 
-**Conversation summarisation.** Three tiers: full recent messages (last 6–8 turns), a rolling summary of older turns, and the user's financial snapshot which is always injected in full and never summarised or dropped. Token count stays bounded. The grounding that makes Vitals Chat different from a generic chatbot is preserved.
+**Conversation summarisation.** Three tiers: full recent messages (last 6 turns verbatim), a rolling summary of older turns, and the user's financial snapshot which is always injected in full and never summarised or dropped. Summarisation triggers after every 8 new turns since the last summary — threshold is (6 + 8) × 2 = 28 messages. Token count stays bounded. The grounding that makes Vitals Chat different from a generic chatbot is preserved.
 
 ---
 

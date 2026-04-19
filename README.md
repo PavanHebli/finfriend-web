@@ -122,6 +122,12 @@ python tests/generate_fake_data.py
 
 ---
 
+## Why it's built this way
+
+The design and product decisions behind Vitals — why no bank connection, how the scoring model works, why the AI narrative is structured the way it is, how Vitals Chat handles guardrails — are documented in [DECISIONS.md](./DECISIONS.md). If you're curious about the reasoning rather than just the code, start there.
+
+---
+
 ## License
 
 MIT

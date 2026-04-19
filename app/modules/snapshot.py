@@ -4,22 +4,34 @@ import streamlit as st
 def render_api_config():
     """
     Renders the API configuration section at the top of the form.
-    Allows user to select LLM provider and enter API key.
+    If HOSTED_API_KEY is set in secrets and sample mode is active,
+    the section is hidden and the hosted key is injected automatically.
     """
+    hosted_key      = st.secrets.get("HOSTED_API_KEY", "")
+    hosted_provider = st.secrets.get("HOSTED_PROVIDER", "groq")
+    use_hosted      = bool(hosted_key) and st.session_state.get("sample_input_active", False)
+
+    if use_hosted:
+        st.session_state.api_key      = hosted_key
+        st.session_state.llm_provider = hosted_provider
+        st.success("✅ Sample mode — AI is ready, no API key needed.")
+        st.divider()
+        return hosted_provider, hosted_key
+
     st.subheader("AI Configuration")
     st.caption("Don't have an API key? [Get one here →](/get_api_key)")
-    
+
     col1, col2 = st.columns([1, 2])
-    
+
     with col1:
         provider = st.selectbox(
             "AI Provider",
             options=["anthropic", "openai", "groq", "gemini"],
-            index=["anthropic", "openai", "groq", "gemini"].index(st.session_state.get("llm_provider", "anthropic")),
+            index=["anthropic", "openai", "groq", "gemini"].index(st.session_state.get("llm_provider", "groq")),
             help="Select the LLM provider to use for AI features"
         )
         st.session_state.llm_provider = provider
-    
+
     with col2:
         api_key = st.text_input(
             "API Key",
@@ -28,7 +40,7 @@ def render_api_config():
             help="Enter your API key for the selected provider"
         )
         st.session_state.api_key = api_key
-    
+
     st.divider()
     return provider, api_key
 

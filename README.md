@@ -39,6 +39,19 @@ Save your snapshot → track progress month over month
 
 ---
 
+## Screenshots
+
+**Health score + metric breakdown**
+![Health Score](assets/health-score.png)
+
+**Expense breakdown chart + AI narrative**
+![Expense Chart](assets/expense-chart.png)
+
+**Full AI narrative + contextual education**
+![AI Narrative](assets/ai-narrative.png)
+
+---
+
 ## Tech Stack
 
 - **Python** 3.9+

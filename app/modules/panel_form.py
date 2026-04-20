@@ -50,6 +50,7 @@ def render_form_panel():
         st.markdown("<br>", unsafe_allow_html=True)
         previous = st.session_state.get("sample_input_active", False)
         sample_on = st.toggle("Sample Input", value=previous)
+        st.markdown("<span style='font-size:0.85rem; color:#1C83E1;'>No API key? Try sample mode!</span>", unsafe_allow_html=True)
         st.session_state.sample_input_active = sample_on
         if sample_on and not previous:
             fill_sample_data()

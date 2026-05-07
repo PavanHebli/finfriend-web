@@ -47,6 +47,29 @@ def main():
         initial_sidebar_state="collapsed"
     )
 
+    # Global font size — Streamlit defaults are too small for most screens
+    st.markdown("""
+        <style>
+            /* Body text and markdown paragraphs */
+            .stMarkdown p, .stMarkdown li { font-size: 1.05rem; line-height: 1.75; }
+            /* Form labels */
+            label { font-size: 1rem !important; }
+            /* Number inputs, selectboxes, text inputs */
+            .stNumberInput input, .stTextInput input { font-size: 1rem !important; }
+            .stSelectbox div[data-baseweb="select"] { font-size: 1rem; }
+            /* Radio and checkbox labels */
+            .stRadio label, .stCheckbox label { font-size: 1rem !important; }
+            /* Captions — slightly larger than Streamlit default */
+            .stCaption p { font-size: 0.9rem !important; }
+            /* Tab labels */
+            .stTabs [data-baseweb="tab"] { font-size: 1rem !important; }
+            .stTabs [data-baseweb="tab"] p { font-size: 1rem !important; }
+            button[data-baseweb="tab"] { font-size: 1rem !important; }
+            /* Buttons */
+            .stButton button, .stDownloadButton button { font-size: 1rem; }
+        </style>
+    """, unsafe_allow_html=True)
+
     init_session_state()
 
     if st.session_state.current_page == "form":

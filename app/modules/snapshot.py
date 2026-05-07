@@ -11,8 +11,6 @@ def render_api_config():
     hosted_provider = st.secrets.get("HOSTED_PROVIDER", "groq")
     show_api_input  = st.secrets.get("SHOW_API_INPUT", True)
     # Edge case: if no hosted key, always show API input regardless of SHOW_API_INPUT
-    #use_hosted      = bool(hosted_key) and not show_api_input and st.session_state.get("sample_input_active", False)
-    print(not show_api_input and bool(hosted_key))
     if not show_api_input and bool(hosted_key):
         st.session_state.api_key      = hosted_key
         st.session_state.llm_provider = hosted_provider

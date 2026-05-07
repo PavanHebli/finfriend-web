@@ -2,6 +2,7 @@ import random
 import streamlit as st
 from modules.snapshot import render_api_config, render_income_section, render_expenses_section, render_position_section, render_context_section
 from modules.storage import load_vit, get_latest, populate_state_from_snapshot
+from modules.analytics import log_snapshot_loaded
 
 
 def fill_sample_data():
@@ -42,26 +43,35 @@ def clear_all_fields():
 
 
 def render_form_panel():
-    col1, col2, col3, col4 = st.columns([5, 1.5, 1, 1])
+    col1, col2 = st.columns([6, 1])
     with col1:
         st.title("🩺 Vitals")
         st.markdown("### Your Personal Financial Health Checkup")
     with col2:
         st.markdown("<br>", unsafe_allow_html=True)
-        previous = st.session_state.get("sample_input_active", False)
-        sample_on = st.toggle("Sample Input", value=previous)
-        st.session_state.sample_input_active = sample_on
-        if sample_on and not previous:
+        st.markdown("<span style='font-size:1.1rem'>[💬 Feedback](/feedback)</span>", unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # --- Sample data banner — always visible ---
+    col_txt, col_try, col_clear = st.columns([4, 1.2, 1])
+    with col_txt:
+        st.markdown(
+            "<p style='font-size:1.05rem; margin:0; padding-top:6px;'>"
+            "🚀 <b>First time here?</b> No API key needed — try the app instantly with sample data.</p>",
+            unsafe_allow_html=True,
+        )
+    with col_try:
+        if st.button("Try sample data →", type="primary", use_container_width=True):
+            st.session_state.sample_input_active = True
             fill_sample_data()
-        elif not sample_on and previous:
+            st.rerun()
+    with col_clear:
+        if st.button("Clear all", type="secondary", use_container_width=True):
             clear_all_fields()
-    with col3:
-        st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("Clear all", type="secondary"):
-            clear_all_fields()
-    with col4:
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("<span style='font-size:1.2rem'>[💬 Feedback](/feedback)</span>", unsafe_allow_html=True)
+
+    if st.session_state.get("sample_input_active", False):
+        st.success("✅ Form pre-filled with sample data — scroll down to review and click **Generate my report**.")
 
     st.markdown("---")
 
@@ -99,6 +109,7 @@ def render_form_panel():
                 populate_state_from_snapshot(latest, st.session_state)
                 st.session_state.previous_snapshot  = latest
                 st.session_state.loaded_snapshots   = data
+                log_snapshot_loaded()
                 st.session_state.pop("narrative_text", None)
                 st.session_state.file_uploader_key  = st.session_state.get("file_uploader_key", 0) + 1
                 del st.session_state.snapshot_preview_data

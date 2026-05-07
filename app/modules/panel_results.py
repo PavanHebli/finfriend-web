@@ -13,6 +13,10 @@ from modules.chat import (
     build_messages, call_llm_chat, classify_question,
     maybe_summarise,
 )
+from modules.analytics import (
+    log_results_viewed, log_narrative_done, log_whatif_used,
+    log_snapshot_saved, log_snapshot_loaded, log_chat_message,
+)
 
 
 _SIM_KEYS = ["sim_income", "sim_dining", "sim_shopping", "sim_subscriptions", "sim_debt_payment"]
@@ -181,6 +185,11 @@ def render_results_panel():
     overall_score = calculate_overall_score(metric_scores)
     mirror        = get_mirror_label(overall_score)
 
+    # Log once per session when results page is first seen
+    if not st.session_state.get("_logged_results_viewed"):
+        log_results_viewed(score_band=mirror["label"])
+        st.session_state._logged_results_viewed = True
+
     # --- Top bar: back button + save button ---
     col_back, _, col_save = st.columns([2, 3, 2])
     with col_back:
@@ -203,16 +212,17 @@ def render_results_panel():
             list(st.session_state.get("loaded_snapshots", [])),
             snapshot,
         )
-        st.download_button(
+        if st.download_button(
             "💾 Save snapshot",
             data=to_vit(snapshots),
             file_name="my_vitals.vit",
             mime="application/octet-stream",
             type="secondary",
-        )
+        ):
+            log_snapshot_saved()
 
     if st.session_state.get("sample_input_active", False):
-        st.warning("You're viewing sample input data. Enter your real numbers for an accurate picture.")
+        st.info("🧪 Viewing sample data — go back and enter your real numbers for an accurate picture.")
 
     st.markdown("---")
 
@@ -241,7 +251,7 @@ def render_results_panel():
     render_expense_chart(st.session_state, metrics, metric_scores)
     st.markdown("---")
 
-    tab1, tab2, tab3, tab4 = st.tabs(["Your Financial Story", "What If?", "Progress", "Vitals Chat"])
+    tab1, tab2, tab3, tab4 = st.tabs(["1 · Your Story", "2 · What If?", "3 · Progress", "4 · Ask Vitals"])
 
     with tab1:
         st.markdown(
@@ -258,15 +268,28 @@ def render_results_panel():
                     st.session_state.api_key
                 ))
                 st.session_state.narrative_text = result
+                log_narrative_done()
             except Exception as e:
                 st.error(f"Could not generate narrative: {str(e)}")
         else:
             st.markdown(st.session_state.narrative_text.replace("$", "\\$"))
 
         st.markdown("---")
+
+        # Save callout — shown once after narrative is ready
+        st.info(
+            "💾 **Want to track your progress next month?** "
+            "Save your snapshot using the button at the top of this page. "
+            "Load it back in 30 days to see how your score has changed."
+        )
+
+        st.markdown("---")
         render_education(metric_scores)
 
     with tab2:
+        if not st.session_state.get("_logged_whatif_used"):
+            log_whatif_used()
+            st.session_state._logged_whatif_used = True
         render_whatif_simulator(overall_score, metric_scores)
 
     with tab3:
@@ -340,6 +363,7 @@ def render_results_panel():
                     st.session_state.llm_provider,
                     st.session_state.api_key,
                 )
+                log_chat_message(categories[0] if categories else "general")
                 snapshot_context = build_snapshot_context(
                     dict(st.session_state), metrics, metric_scores, overall_score, mirror
                 )

@@ -251,7 +251,7 @@ def render_results_panel():
     render_expense_chart(st.session_state, metrics, metric_scores)
     st.markdown("---")
 
-    tab1, tab2, tab3, tab4 = st.tabs(["1 · Your Story", "2 · What If?", "3 · Progress", "4 · Ask Vitals"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Your Story", "What If?", "Progress", "Ask Vitals"])
 
     with tab1:
         st.markdown(

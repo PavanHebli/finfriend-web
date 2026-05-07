@@ -46,7 +46,7 @@ Each entry: what + why | files touched | priority | done
 | 8 | **Metric Citations** | Show benchmark source (CFPB, HUD, Fidelity/Vanguard, 50/30/20) next to each metric. Builds trust. | `panel_results.py` | ⬜ |
 | 9 | **AI Personas** | Narrative tone selector: Honest Friend (default), Finance Professional, Tough Love. System prompt variation. | `narrative.py`, `panel_form.py` | ⬜ |
 | 10 | **Form Assistant Chat** | User types "my rent is $1,200 and I earn $4,500" → form auto-fills. Requires intent parsing + session state mutation from chat. | new `form_chat.py`, `panel_form.py` | ⬜ |
-| 11 | **Hosted API Key (remove BYOK friction)** | Vitals absorbs AI cost for basic use — user gets free tier without needing an API key. Requires billing and rate limiting. Removes the single biggest non-technical barrier to adoption. | `main.py`, `narrative.py`, `chat.py` | ⬜ |
+| 11 | **Hosted API Key (remove BYOK friction)** | Vitals absorbs AI cost for basic use — user gets free tier without needing an API key. Controlled via `SHOW_API_INPUT` + `HOSTED_API_KEY` in secrets. No code change needed to toggle. | `snapshot.py` | ✅ |
 
 ---
 
@@ -111,6 +111,10 @@ Each entry: what + why | files touched | priority | done
 | Vitals Chat Phase 5c — 9 category-specific prompt blocks | ✅ |
 | Vitals Chat Phase 5d — conversation summarisation (8 turns, keep 6 verbatim) | ✅ |
 | Rebrand from FinFriend → Vitals (.vit file format, 🩺 icon) | ✅ |
+| Hosted API key — `SHOW_API_INPUT` + `HOSTED_API_KEY` in secrets, zero friction for users | ✅ |
+| Session analytics — `analytics.py` + Supabase `sessions` table, tracks funnel: results → narrative → whatif → save → return | ✅ |
+| UX improvements — sample data banner, tab numbering (1·Story / 2·What If? / 3·Progress / 4·Ask Vitals), save callout, global font size bump | ✅ |
+| Screenshots added to README (`assets/` folder) | ✅ |
 
 ---
 

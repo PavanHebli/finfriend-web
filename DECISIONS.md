@@ -62,6 +62,16 @@ A single generic prompt was considered and rejected. A generic prompt hedges acr
 
 ---
 
+## Analytics
+
+Vitals tracks one row per session in a Supabase `sessions` table — no PII, no raw messages, no personal financial data. What gets logged: whether the user reached the results page, whether the narrative completed, whether they opened the What-If tab, whether they saved or loaded a snapshot, how many chat turns they had, and which topic categories came up in chat (e.g. `{"debt": 3, "scenario": 2}`).
+
+The goal is funnel visibility: how many visitors complete the form, how many engage with chat, how many save a snapshot (intent to return). Chat categories aggregate across sessions to show what users actually care about — used to prioritise feature work, not to monitor individuals.
+
+Provider is logged as `"hosted"` when the app is running with a hosted key (`SHOW_API_INPUT = false`), and as the actual provider name when users bring their own key. Controlled entirely from secrets — no code change needed to switch modes.
+
+---
+
 ## What Vitals isn't
 
 **Not a spending tracker.** Vitals is a diagnostic. You come to it when you want to understand your situation — monthly, or when something changes. Real-time tracking is a different product (Mint, YNAB) and a harder infrastructure problem. The value is in the analysis and the story, not the data collection.

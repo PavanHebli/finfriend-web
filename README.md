@@ -60,7 +60,7 @@ Save your snapshot → track progress month over month
 - **Cryptography (Fernet)** — `.vit` file encryption
 - **LLM Providers** — Anthropic, OpenAI, Groq (default — free tier), Gemini
 
-**User brings their own API key.** Don't have one? See the [Get API Key](https://myfinance-vitals.streamlit.app/get_api_key) page inside the app.
+**No API key needed** — the app runs on a hosted key by default. Bring your own key by setting `SHOW_API_INPUT = true` in secrets.
 
 ---
 
@@ -68,7 +68,7 @@ Save your snapshot → track progress month over month
 
 ### Prerequisites
 - Python 3.9+
-- API key from Groq (free), Anthropic, OpenAI, or Gemini
+- API key from Groq (free), Anthropic, OpenAI, or Gemini (only needed if running locally without a hosted key)
 
 ### Install
 ```bash
@@ -112,7 +112,8 @@ vitals/
         ├── progress.py       # Progress Charts: merge history + current, render charts
         ├── chat.py           # Vitals Chat: prompt, guardrails, classifier, streaming
         ├── feedback_db.py    # Supabase client + submit_feedback()
-        ├── panel_form.py     # Panel 1 UI: form, toggle, import snapshot
+        ├── analytics.py      # Session-level event tracking via Supabase (upsert per session)
+        ├── panel_form.py     # Panel 1 UI: form, sample data banner, import snapshot
         └── panel_results.py  # Panel 2 UI: score, breakdown, 4 tabs
 ```
 

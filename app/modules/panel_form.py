@@ -49,7 +49,12 @@ def render_form_panel():
         st.markdown("### Your Personal Financial Health Checkup")
     with col2:
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("<span style='font-size:1.1rem'>[💬 Feedback](/feedback)</span>", unsafe_allow_html=True)
+        st.markdown(
+            "<a href='/feedback' target='_self' style='"
+            "font-size:1rem; padding:6px 14px; border:1.5px solid #ccc; border-radius:6px;"
+            "text-decoration:none; color:inherit;'>💬 Feedback</a>",
+            unsafe_allow_html=True,
+        )
 
     st.markdown("---")
 

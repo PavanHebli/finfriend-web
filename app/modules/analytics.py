@@ -43,6 +43,19 @@ def _upsert(data: dict):
             print(f"[ANALYTICS] upsert failed — {e}")
 
 
+def _get_device() -> str:
+    """Returns 'mobile', 'tablet', or 'desktop' based on User-Agent."""
+    try:
+        ua = st.context.headers.get("User-Agent", "").lower()
+        if any(x in ua for x in ["ipad", "tablet"]) or ("android" in ua and "mobile" not in ua):
+            return "tablet"
+        if any(x in ua for x in ["mobile", "iphone", "ipod", "android"]):
+            return "mobile"
+    except Exception:
+        pass
+    return "desktop"
+
+
 def log_results_viewed(score_band: str):
     show_api = st.secrets.get("SHOW_API_INPUT", True)
     provider = st.session_state.get("llm_provider", "") if show_api else "hosted"
@@ -50,6 +63,7 @@ def log_results_viewed(score_band: str):
         "results_viewed": True,
         "score_band":     score_band,
         "provider":       provider,
+        "device":         _get_device(),
     })
 
 

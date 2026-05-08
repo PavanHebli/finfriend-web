@@ -28,7 +28,7 @@ def submit_feedback(
             "feature_suggestion":    feature_suggestion or None,
             "anything_else":         anything_else or None,
             "email":                 email or None,
-        }).execute()
+        }, returning="minimal").execute()
         return True
     except Exception as e:
         st.error(f"Could not save feedback: {e}")

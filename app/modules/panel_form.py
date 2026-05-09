@@ -1,4 +1,5 @@
 import random
+from pathlib import Path
 import streamlit as st
 from modules.snapshot import render_api_config, render_income_section, render_expenses_section, render_position_section, render_context_section
 from modules.storage import load_vit, get_latest, populate_state_from_snapshot
@@ -43,9 +44,11 @@ def clear_all_fields():
 
 
 def render_form_panel():
+    _LOGO = Path(__file__).parent.parent.parent / "assets" / "Logo_1024x1024.png"
+
     col1, col2 = st.columns([6, 1])
     with col1:
-        st.title("🩺 Vitals")
+        st.image(str(_LOGO), width=180)
         st.markdown("### Your Personal Financial Health Checkup")
     with col2:
         st.markdown("<br>", unsafe_allow_html=True)

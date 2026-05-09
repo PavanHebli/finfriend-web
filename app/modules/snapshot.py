@@ -15,7 +15,7 @@ def render_api_config():
         st.session_state.api_key      = hosted_key
         st.session_state.llm_provider = hosted_provider
         # st.success("✅ AI is ready, no API key needed.")
-        st.divider()
+        # st.divider()
         return hosted_provider, hosted_key
 
     st.subheader("AI Configuration")

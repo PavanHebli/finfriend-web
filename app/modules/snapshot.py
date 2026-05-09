@@ -14,7 +14,7 @@ def render_api_config():
     if not show_api_input and bool(hosted_key):
         st.session_state.api_key      = hosted_key
         st.session_state.llm_provider = hosted_provider
-        st.success("✅ AI is ready, no API key needed.")
+        # st.success("✅ AI is ready, no API key needed.")
         st.divider()
         return hosted_provider, hosted_key
 

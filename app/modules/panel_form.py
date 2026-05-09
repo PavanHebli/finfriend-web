@@ -48,7 +48,8 @@ def render_form_panel():
 
     col1, col2 = st.columns([6, 1])
     with col1:
-        st.image(str(_LOGO), width=180)
+        # st.image(str(_LOGO), width=180)
+        st.title("🩺 Vitals")
         st.markdown("### Your Personal Financial Health Checkup")
     with col2:
         st.markdown("<br>", unsafe_allow_html=True)

@@ -115,6 +115,20 @@ Each entry: what + why | files touched | priority | done
 | Session analytics — `analytics.py` + Supabase `sessions` table, tracks funnel: results → narrative → whatif → save → return | ✅ |
 | UX improvements — sample data banner, tab numbering (1·Story / 2·What If? / 3·Progress / 4·Ask Vitals), save callout, global font size bump | ✅ |
 | Screenshots added to README (`assets/` folder) | ✅ |
+| Device tracking — `_get_device()` in analytics.py using `st.context.headers` User-Agent | ✅ |
+| Progressive form reveal — sections 2–4 as expanders with one-way unlock flags, total expenses estimate in section 1 | ✅ |
+| Privacy trust note — `st.caption()` above income fields | ✅ |
+| Logo in form header — `assets/Logo.png` rendered via `st.image()` | ✅ |
+| Shared `get_financial_context()` — extracted to `health.py`, used by both `narrative.py` and `chat.py` | ✅ |
+| Partial data handling — narrative and chat handle missing sections gracefully with "not provided" text | ✅ |
+| Feedback form RLS fix — `returning="minimal"` in `feedback_db.py` | ✅ |
+| `ENABLE_LOGGING` secret — disable Supabase writes locally to avoid fake data | ✅ |
+| Custom CSS file — `.streamlit/custom.css` with Inter font, pill buttons, raised active tab, expander fade-in, metric card animations | ✅ |
+| Theme config — soft light default in `config.toml`, Dark available via ≡ menu, multiple palette presets documented | ✅ |
+| Metric breakdown redesign — 4-tile grid (single row) with progress bars and benchmark hints | ✅ |
+| Score display — CSS pop animation, theme-adaptive `var(--text-color)` | ✅ |
+| Tab fix — hidden `tab-highlight` and `tab-border` to remove duplicate blue line | ✅ |
+| Results page layout — sample banner above buttons, save button pinned far right | ✅ |
 
 ---
 

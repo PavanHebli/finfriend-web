@@ -64,11 +64,35 @@ A single generic prompt was considered and rejected. A generic prompt hedges acr
 
 ## Analytics
 
-Vitals tracks one row per session in a Supabase `sessions` table — no PII, no raw messages, no personal financial data. What gets logged: whether the user reached the results page, whether the narrative completed, whether they opened the What-If tab, whether they saved or loaded a snapshot, how many chat turns they had, and which topic categories came up in chat (e.g. `{"debt": 3, "scenario": 2}`).
+Vitals tracks one row per session in a Supabase `sessions` table — no PII, no raw messages, no personal financial data. What gets logged: whether the user reached the results page, whether the narrative completed, whether they opened the What-If tab, whether they saved or loaded a snapshot, how many chat turns they had, which topic categories came up in chat (e.g. `{"debt": 3, "scenario": 2}`), and device type (mobile/tablet/desktop via User-Agent).
 
 The goal is funnel visibility: how many visitors complete the form, how many engage with chat, how many save a snapshot (intent to return). Chat categories aggregate across sessions to show what users actually care about — used to prioritise feature work, not to monitor individuals.
 
 Provider is logged as `"hosted"` when the app is running with a hosted key (`SHOW_API_INPUT = false`), and as the actual provider name when users bring their own key. Controlled entirely from secrets — no code change needed to switch modes.
+
+Setting `ENABLE_LOGGING = false` in secrets disables all Supabase writes — used locally during development so test sessions don't pollute production data.
+
+---
+
+## Progressive form
+
+The original form showed all sections at once — income, 7 expense categories, savings/debt, and personal context. This creates cognitive overload before the user has committed to anything.
+
+The current approach starts with two fields: income and a rough total expenses estimate. Sections 2–4 appear as collapsible expanders, unlocking one at a time as the user engages. Section 2 (expense breakdown) unlocks once income and total expenses are filled. Section 3 (financial position) unlocks after any expense detail is entered. Section 4 (personal context) unlocks after any position field is filled.
+
+The unlock flags are one-way: once `section2_visible = True`, it never goes back to False within a session. This prevents sections from disappearing when a widget re-renders. When detailed expenses are not provided, the rough total estimate proxies into `expenses_other` so the health score still calculates correctly from section 1 data alone.
+
+The `narrative.py` and `chat.py` prompts handle partial data gracefully — they show "not provided" for unfilled sections and instruct the model not to estimate or assume values for missing data. This means the app produces a useful result at every level of detail the user provides.
+
+---
+
+## UI and theming
+
+The UI uses a custom CSS file (`.streamlit/custom.css`) loaded at startup rather than inline styles scattered across Python files. This separates styling from logic — any visual change happens in one place without touching Python.
+
+Theme colours are defined in `.streamlit/config.toml` as Streamlit theme variables. All HTML components use `var(--text-color)` and `var(--secondary-background-color)` rather than hardcoded colours — this makes every component adapt automatically to both the light and dark theme without any conditional logic. Users can toggle between light and dark via the settings menu.
+
+The default theme is a soft warm light (not harsh white) chosen deliberately. First-time users — the primary audience — are more likely to engage with something that feels calm and approachable than with a stark data-dashboard aesthetic. Dark mode is available for users who prefer it.
 
 ---
 

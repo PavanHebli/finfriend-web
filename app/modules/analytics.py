@@ -27,8 +27,16 @@ def _get_session_id() -> str:
     return st.session_state.analytics_session_id
 
 
+def _logging_enabled() -> bool:
+    return st.secrets.get("ENABLE_LOGGING", True)
+
+
 def _upsert(data: dict):
     """Upserts a row into the sessions table. Fails silently."""
+    if not _logging_enabled():
+        if _debug():
+            print(f"[ANALYTICS] logging disabled — skipping upsert data={data}")
+        return
     try:
         session_id = _get_session_id()
         client = _get_client()

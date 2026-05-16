@@ -32,7 +32,10 @@ def init_session_state():
         "loaded_snapshots": [],
         "chat_history": [],
         "chat_summary": "",
-
+        "expenses_total_estimate": 0.0,
+        "section2_visible": False,
+        "section3_visible": False,
+        "section4_visible": False,
     }
     for key, value in defaults.items():
         if key not in st.session_state:

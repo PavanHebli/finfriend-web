@@ -168,30 +168,54 @@ STARTER_QUESTIONS = [
 # ---------------------------------------------------------------------------
 
 def build_snapshot_context(state, metrics, metric_scores, overall_score, mirror) -> str:
-    income = state.get("income_main", 0.0) + state.get("income_additional", 0.0)
-    total_expenses = (
-        state.get("expenses_rent", 0.0) +
-        state.get("expenses_groceries", 0.0) +
-        state.get("expenses_transport", 0.0) +
-        state.get("expenses_subscriptions", 0.0) +
-        state.get("expenses_dining", 0.0) +
-        state.get("expenses_shopping", 0.0) +
-        state.get("expenses_other", 0.0)
-    )
+    from modules.health import get_financial_context
+    ctx = get_financial_context(state)
+    s2, s3, s4 = ctx["s2"], ctx["s3"], ctx["s4"]
+
+    if s2:
+        e = ctx["expenses"]
+        expense_lines = (
+            f"- Expense breakdown:        Rent ${e['rent']:,.0f} · "
+            f"Groceries ${e['groceries']:,.0f} · "
+            f"Transport ${e['transport']:,.0f} · "
+            f"Subscriptions ${e['subscriptions']:,.0f} · "
+            f"Dining ${e['dining']:,.0f} · "
+            f"Shopping ${e['shopping']:,.0f} · "
+            f"Other ${e['other']:,.0f}"
+        )
+    else:
+        expense_lines = (
+            f"- Total monthly expenses:   ${ctx['expenses_total_estimate']:,.0f} "
+            f"(rough estimate — breakdown not provided)"
+        )
+
+    if s3:
+        position_lines = (
+            f"- Monthly debt payment:     ${ctx['debt_monthly']:,.0f}\n"
+            f"- Total debt:               ${ctx['debt_total']:,.0f}\n"
+            f"- Total savings:            ${ctx['savings']:,.0f}\n"
+            f"- Total investments:        ${ctx['investments']:,.0f}"
+        )
+    else:
+        position_lines = "- Savings / debt / investments: not provided"
+
+    if s4:
+        profile_lines = (
+            f"- Age:                      {ctx['age']}\n"
+            f"- Employment:               {ctx['employment']}\n"
+            f"- Has health insurance:     {'Yes' if ctx['has_health_insurance'] else 'No'}\n"
+            f"- Emergency fund status:    {ctx['has_emergency_fund']}\n"
+            f"- Contributing to 401k:     {ctx['contributing_401k']}"
+        )
+    else:
+        profile_lines = "- Personal context (age, employment, insurance, 401k): not provided"
 
     return f"""
-USER'S FINANCIAL SNAPSHOT (use these numbers to ground every answer):
-- Monthly take-home income:  ${income:,.0f}
-- Total monthly expenses:    ${total_expenses:,.0f}
-- Monthly debt payment:      ${state.get('debt_monthly', 0.0):,.0f}
-- Total debt:                ${state.get('debt_total', 0.0):,.0f}
-- Total savings:             ${state.get('savings_total', 0.0):,.0f}
-- Total investments:         ${state.get('investments_total', 0.0):,.0f}
-- Age:                       {state.get('age', 'unknown')}
-- Employment:                {state.get('employment', 'unknown')}
-- Has health insurance:      {'Yes' if state.get('has_health_insurance') else 'No'}
-- Emergency fund status:     {state.get('has_emergency_fund', 'unknown')}
-- Contributing to 401k:      {state.get('contributing_401k', 'No')}
+USER'S FINANCIAL SNAPSHOT (use these numbers to ground every answer. Only reference data marked as provided):
+- Monthly take-home income:  ${ctx['income']:,.0f}
+{expense_lines}
+{position_lines}
+{profile_lines}
 
 HEALTH SCORE: {overall_score}/100 — {mirror['label']}
 

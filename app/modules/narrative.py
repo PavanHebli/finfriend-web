@@ -55,40 +55,68 @@ def call_llm(prompt: str, provider: str, api_key: str):
 def build_prompt(state, metrics, metric_scores, overall_score, mirror) -> str:
     """
     Builds the LLM prompt using the user's financial data, computed metrics, and scores.
+    Handles partial data gracefully when optional form sections were skipped.
     """
-    income = state.get("income_main", 0.0) + state.get("income_additional", 0.0)
+    from modules.health import get_financial_context
+    ctx = get_financial_context(state)
+    s2, s3, s4 = ctx["s2"], ctx["s3"], ctx["s4"]
 
-    monthly_expenses = (
-        state.get("expenses_rent", 0.0) +
-        state.get("expenses_groceries", 0.0) +
-        state.get("expenses_transport", 0.0) +
-        state.get("expenses_subscriptions", 0.0) +
-        state.get("expenses_dining", 0.0) +
-        state.get("expenses_shopping", 0.0) +
-        state.get("expenses_other", 0.0)
-    )
+    if s2:
+        e = ctx["expenses"]
+        expense_breakdown = (
+            f"## Expense Breakdown\n"
+            f"- Rent: ${e['rent']:,.2f} (essential)\n"
+            f"- Groceries: ${e['groceries']:,.2f} (essential)\n"
+            f"- Transport: ${e['transport']:,.2f} (essential)\n"
+            f"- Subscriptions: ${e['subscriptions']:,.2f} (discretionary)\n"
+            f"- Dining out: ${e['dining']:,.2f} (luxury)\n"
+            f"- Shopping: ${e['shopping']:,.2f} (luxury)\n"
+            f"- Other: ${e['other']:,.2f}"
+        )
+    else:
+        expense_breakdown = (
+            f"## Expense Breakdown\n"
+            f"Not provided — user gave a total estimate of ${ctx['expenses_total_estimate']:,.2f}/month. "
+            f"Do not break down by category or suggest cutting specific expense lines."
+        )
+
+    if s3:
+        position_lines = (
+            f"- Total Savings: ${ctx['savings']:,.2f}\n"
+            f"- Total Investments: ${ctx['investments']:,.2f}\n"
+            f"- Total Debt: ${ctx['debt_total']:,.2f}"
+        )
+    else:
+        position_lines = "- Savings / investments / debt: not provided — do not reference these."
+
+    if s4:
+        profile_section = (
+            f"## User Profile\n"
+            f"- Age: {ctx['age']} | Employment: {ctx['employment']}\n"
+            f"- Health Insurance: {'Yes' if ctx['has_health_insurance'] else 'No'}\n"
+            f"- Emergency Fund: {ctx['has_emergency_fund']}\n"
+            f"- Contributing to 401k: {ctx['contributing_401k']}"
+        )
+    else:
+        profile_section = (
+            "## User Profile\n"
+            "Not provided — omit all advice about age, insurance, emergency fund, and 401k."
+        )
 
     return f"""
 You are Vitals — a brutally honest financial health checker.
 You've just looked at someone's numbers. Answer 4 questions below.
 
-## Their Numbers
-- Monthly Income: ${income:,.2f}
-- Monthly Expenses: ${monthly_expenses:,.2f}
-- Monthly Debt Payments: ${state.get("debt_monthly", 0.0):,.2f}
-- Cash left this month: ${metrics["net_monthly_flow"]:,.2f}
-- Total Savings: ${state.get("savings_total", 0.0):,.2f}
-- Total Investments: ${state.get("investments_total", 0.0):,.2f}
-- Total Debt: ${state.get("debt_total", 0.0):,.2f}
+IMPORTANT: Only reference data that was provided. If a section says "not provided", do not estimate, assume, or invent values for it.
 
-## Expense Breakdown
-- Rent: ${state.get("expenses_rent", 0.0):,.2f} (essential)
-- Groceries: ${state.get("expenses_groceries", 0.0):,.2f} (essential)
-- Transport: ${state.get("expenses_transport", 0.0):,.2f} (essential)
-- Subscriptions: ${state.get("expenses_subscriptions", 0.0):,.2f} (discretionary)
-- Dining out: ${state.get("expenses_dining", 0.0):,.2f} (luxury)
-- Shopping: ${state.get("expenses_shopping", 0.0):,.2f} (luxury)
-- Other: ${state.get("expenses_other", 0.0):,.2f}
+## Their Numbers
+- Monthly Income: ${ctx['income']:,.2f}
+- Monthly Expenses: ${ctx['total_expenses']:,.2f}
+- Monthly Debt Payments: ${ctx['debt_monthly']:,.2f}
+- Cash left this month: ${metrics["net_monthly_flow"]:,.2f}
+{position_lines}
+
+{expense_breakdown}
 
 ## Health Score: {overall_score}/100 — {mirror["label"]}
 - Savings Rate: {metrics["savings_rate"]}% ({metric_scores["savings_rate"]["status"]})
@@ -96,11 +124,7 @@ You've just looked at someone's numbers. Answer 4 questions below.
 - Emergency Fund: {metrics["emergency_fund_months"]} months ({metric_scores["emergency_fund_months"]["status"]})
 - Housing Ratio: {metrics["housing_ratio"]}% ({metric_scores["housing_ratio"]["status"]})
 
-## User Profile
-- Age: {state.get("age")} | Employment: {state.get("employment")}
-- Health Insurance: {"Yes" if state.get("has_health_insurance") else "No"}
-- Emergency Fund: {state.get("has_emergency_fund")}
-- Contributing to 401k: {state.get("contributing_401k")}
+{profile_section}
 
 ## Zero value rules
 - Savings = 0 → they have no savings. Say it directly.

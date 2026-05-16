@@ -46,12 +46,6 @@ def render_api_config():
 
 
 def render_income_section():
-    """
-    Renders Section A: Income inputs.
-    Collects main monthly income and optional additional income.
-    """
-    st.subheader("Section A: Income")
-    
     col1, col2 = st.columns(2)
     
     with col1:
@@ -80,13 +74,7 @@ def render_income_section():
 
 
 def render_expenses_section():
-    """
-    Renders Section B: Monthly Expenses inputs.
-    Collects all 7 expense categories.
-    """
-    st.subheader("Section B: Monthly Expenses")
     st.caption("Round to the nearest $25. Not sure? Your bank app's monthly summary is the fastest way to check.")
-    
     expenses = {}
     
     col1, col2 = st.columns(2)
@@ -158,12 +146,6 @@ def render_expenses_section():
 
 
 def render_position_section():
-    """
-    Renders Section C: Financial Position inputs.
-    Collects savings, investments, debt information.
-    """
-    st.subheader("Section C: Financial Position")
-    
     col1, col2 = st.columns(2)
     
     with col1:
@@ -210,12 +192,6 @@ def render_position_section():
 
 
 def render_context_section():
-    """
-    Renders Section D: Context inputs.
-    Collects age, employment, insurance, emergency fund, 401k info.
-    """
-    st.subheader("Section D: Context")
-    
     col1, col2 = st.columns(2)
     
     with col1:

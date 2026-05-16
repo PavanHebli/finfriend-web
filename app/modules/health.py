@@ -1,4 +1,50 @@
 
+_EXPENSE_KEYS = ["rent", "groceries", "transport", "subscriptions", "dining", "shopping", "other"]
+
+
+def get_financial_context(state: dict) -> dict:
+    """
+    Returns available financial data based on which form sections were filled.
+    narrative.py and chat.py use this instead of duplicating flag + data extraction.
+
+    Keys always present: income, total_expenses, expenses_total_estimate, debt_monthly, s2, s3, s4
+    Keys present only when section was filled:
+      s2 → expenses (dict of individual amounts)
+      s3 → savings, investments, debt_total
+      s4 → age, employment, has_health_insurance, has_emergency_fund, contributing_401k
+    """
+    s2 = state.get("section2_visible", False)
+    s3 = state.get("section3_visible", False)
+    s4 = state.get("section4_visible", False)
+
+    total_expenses = sum(state.get(f"expenses_{k}", 0.0) for k in _EXPENSE_KEYS)
+
+    ctx: dict = {
+        "income":                  state.get("income_main", 0.0) + state.get("income_additional", 0.0),
+        "total_expenses":          total_expenses,
+        "expenses_total_estimate": state.get("expenses_total_estimate", total_expenses),
+        "debt_monthly":            state.get("debt_monthly", 0.0),
+        "s2": s2, "s3": s3, "s4": s4,
+    }
+
+    if s2:
+        ctx["expenses"] = {k: state.get(f"expenses_{k}", 0.0) for k in _EXPENSE_KEYS}
+
+    if s3:
+        ctx["savings"]      = state.get("savings_total", 0.0)
+        ctx["investments"]  = state.get("investments_total", 0.0)
+        ctx["debt_total"]   = state.get("debt_total", 0.0)
+
+    if s4:
+        ctx["age"]                 = state.get("age")
+        ctx["employment"]          = state.get("employment")
+        ctx["has_health_insurance"]= state.get("has_health_insurance", False)
+        ctx["has_emergency_fund"]  = state.get("has_emergency_fund")
+        ctx["contributing_401k"]   = state.get("contributing_401k")
+
+    return ctx
+
+
 def calculate_metrics(state) -> dict:
     """
     Computes raw financial metrics from session state.

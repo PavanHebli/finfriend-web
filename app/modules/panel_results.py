@@ -23,39 +23,26 @@ _SIM_KEYS = ["sim_income", "sim_dining", "sim_shopping", "sim_subscriptions", "s
 
 
 def render_health_score(score: int, mirror: dict):
-    """
-    Displays the overall health score and mirror label, centered.
-    """
-    st.markdown("<h2 style='text-align: center;'>Your Financial Score</h2>", unsafe_allow_html=True)
-
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.markdown(f"<h1 style='text-align: center;'>{score} / 100</h1>", unsafe_allow_html=True)
-
-        color_map = {
-            "Critical": "#FF4B4B",
-            "At Risk":  "#FF8C00",
-            "Fair":     "#FFD700",
-            "Good":     "#1C83E1",
-            "Healthy":  "#00C853",
-        }
-        color = color_map.get(mirror["label"], "#FFFFFF")
-
-        st.markdown(
-            f"<h3 style='text-align: center; color: {color};'>{mirror['label']}</h3>",
-            unsafe_allow_html=True
-        )
-        st.markdown(
-            f"<p style='text-align: center;'>{mirror['description']}</p>",
-            unsafe_allow_html=True
-        )
+    color_map = {
+        "Critical": "#FF4B4B",
+        "At Risk":  "#FF8C00",
+        "Fair":     "#FFD700",
+        "Good":     "#1C83E1",
+        "Healthy":  "#00C853",
+    }
+    color = color_map.get(mirror["label"], "#FFFFFF")
+    st.markdown(f"""
+<div style="text-align:center; padding:28px 16px 20px; font-family:'Inter',sans-serif;">
+  <div style="font-size:0.8rem; font-weight:500; color:var(--text-color); opacity:0.5; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:10px;">Financial Health Score</div>
+  <div class="vitals-score-number" style="font-size:5.5rem; font-weight:700; color:var(--text-color); line-height:1; letter-spacing:-3px; display:inline-block;">{score}</div>
+  <div style="font-size:1rem; color:var(--text-color); opacity:0.35; margin-bottom:14px;">/ 100</div>
+  <div style="display:inline-block; font-size:1.25rem; font-weight:600; color:{color}; background:{color}1a; border:1px solid {color}44; padding:5px 22px; border-radius:20px; margin-bottom:10px;">{mirror['label']}</div>
+  <div style="font-size:0.9rem; color:var(--text-color); opacity:0.6; max-width:380px; margin:0 auto; line-height:1.5;">{mirror['description']}</div>
+</div>
+""", unsafe_allow_html=True)
 
 
 def render_metrics_breakdown(metrics: dict, metric_scores: dict):
-    """
-    Displays each scored metric as a row with raw value, status, and score.
-    Net monthly flow shown separately at the bottom.
-    """
     st.markdown("### Breakdown")
 
     color_map = {
@@ -65,32 +52,52 @@ def render_metrics_breakdown(metrics: dict, metric_scores: dict):
         "good":    "#00C853",
     }
 
-    rows = [
-        ("Savings Rate",   f"{metrics['savings_rate']}%",           metric_scores["savings_rate"]),
-        ("Debt-to-Income", f"{metrics['debt_to_income']}%",          metric_scores["debt_to_income"]),
-        ("Emergency Fund", f"{metrics['emergency_fund_months']} mo", metric_scores["emergency_fund_months"]),
-        ("Housing Ratio",  f"{metrics['housing_ratio']}%",           metric_scores["housing_ratio"]),
+    tiles = [
+        ("Savings Rate",   f"{metrics['savings_rate']}%",           metric_scores["savings_rate"], "Target ≥ 20%"),
+        ("Debt-to-Income", f"{metrics['debt_to_income']}%",          metric_scores["debt_to_income"], "Safe zone < 20%"),
+        ("Emergency Fund", f"{metrics['emergency_fund_months']} mo", metric_scores["emergency_fund_months"], "Goal: 3–6 months"),
+        ("Housing Ratio",  f"{metrics['housing_ratio']}%",           metric_scores["housing_ratio"], "HUD limit ≤ 30%"),
     ]
 
-    for name, value, score_data in rows:
-        col1, col2, col3, col4 = st.columns([3, 2, 2, 1])
+    tiles_html = '<div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:16px;">'
+    for i, (name, value, score_data, benchmark) in enumerate(tiles):
         color = color_map[score_data["status"]]
-        dot = f"<span style='color:{color}; font-size:18px;'>&#9679;</span>"
-        with col1:
-            st.markdown(f"**{name}**")
-        with col2:
-            st.markdown(value)
-        with col3:
-            st.markdown(f"{dot} {score_data['status'].capitalize()}", unsafe_allow_html=True)
-        with col4:
-            st.markdown(f"{score_data['score']}/25")
+        pct   = int(score_data["score"] / 25 * 100)
+        tiles_html += f"""
+<div style="
+    background:var(--secondary-background-color);
+    border-radius:14px;
+    padding:16px 18px;
+    border-top:3px solid {color};
+    box-shadow:0 2px 8px rgba(0,0,0,0.06);
+    animation:fadeSlideUp 0.35s ease {i * 0.07}s both;
+    font-family:'Inter',sans-serif;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+">
+  <div style="font-size:0.78rem; font-weight:500; color:var(--text-color); opacity:0.5; text-transform:uppercase; letter-spacing:0.05em;">{name}</div>
+  <div style="font-size:2rem; font-weight:700; color:var(--text-color); line-height:1;">{value}</div>
+  <div>
+    <div style="height:4px; border-radius:2px; background:rgba(128,128,128,0.15); overflow:hidden;">
+      <div style="height:100%; width:{pct}%; background:{color}; border-radius:2px;"></div>
+    </div>
+  </div>
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <span style="font-size:0.8rem; font-weight:600; color:{color};">{score_data['status'].capitalize()}</span>
+    <span style="font-size:0.75rem; color:var(--text-color); opacity:0.4;">{benchmark}</span>
+  </div>
+</div>"""
+    tiles_html += "</div>"
+
+    st.markdown(tiles_html, unsafe_allow_html=True)
 
     st.markdown("---")
 
     flow = metric_scores["net_monthly_flow"]["value"]
     flow_color = "#00C853" if flow >= 0 else "#FF4B4B"
     st.markdown(
-        f"<b>Cash left this month:</b> <span style='color:{flow_color};'>${flow:,.2f}</span>",
+        f"<span style='color:var(--text-color);'><b>Cash left this month:</b></span> <span style='color:{flow_color}; font-weight:600;'>${flow:,.2f}</span>",
         unsafe_allow_html=True
     )
 
@@ -190,8 +197,24 @@ def render_results_panel():
         log_results_viewed(score_band=mirror["label"])
         st.session_state._logged_results_viewed = True
 
-    # --- Top bar: back button + save button ---
-    col_back, _, col_save = st.columns([2, 3, 2])
+    if st.session_state.get("sample_input_active", False):
+        st.info("🧪 Viewing sample data — go back and enter your real numbers for an accurate picture.")
+
+    # --- Top bar: back button on left, save button pinned to far right ---
+    snapshot  = create_snapshot(
+        dict(st.session_state),
+        metrics,
+        metric_scores,
+        overall_score,
+        mirror,
+        st.session_state.get("narrative_text", ""),
+    )
+    snapshots = append_or_overwrite(
+        list(st.session_state.get("loaded_snapshots", [])),
+        snapshot,
+    )
+
+    col_back, _, col_save = st.columns([2, 6, 2])
     with col_back:
         if st.button("← Edit my data"):
             st.session_state.pop("narrative_text", None)
@@ -200,29 +223,15 @@ def render_results_panel():
             st.session_state.current_page = "form"
             st.rerun()
     with col_save:
-        snapshot  = create_snapshot(
-            dict(st.session_state),
-            metrics,
-            metric_scores,
-            overall_score,
-            mirror,
-            st.session_state.get("narrative_text", ""),
-        )
-        snapshots = append_or_overwrite(
-            list(st.session_state.get("loaded_snapshots", [])),
-            snapshot,
-        )
         if st.download_button(
             "💾 Save snapshot",
             data=to_vit(snapshots),
             file_name="my_vitals.vit",
             mime="application/octet-stream",
             type="secondary",
+            use_container_width=True,
         ):
             log_snapshot_saved()
-
-    if st.session_state.get("sample_input_active", False):
-        st.info("🧪 Viewing sample data — go back and enter your real numbers for an accurate picture.")
 
     st.markdown("---")
 

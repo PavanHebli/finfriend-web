@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 from modules.panel_form import render_form_panel
 from modules.panel_results import render_results_panel
@@ -50,67 +51,9 @@ def main():
         initial_sidebar_state="collapsed"
     )
 
-    # Global font sizes — change --label-size and --caption-size to affect everything at once
-    st.markdown("""
-        <style>
-            :root {
-                --label-size:   1.05rem;
-                --caption-size: 0.5rem;
-                --body-size:    1.05rem;
-                --input-size:   1.0rem;
-                --button-size:  1.0rem;
-                --tab-size:     1.5rem;
-            }
-
-            /* Body text and markdown paragraphs */
-            .stMarkdown p, .stMarkdown li { font-size: var(--body-size); line-height: 1.75; }
-
-            /* All form labels — target the <p> inside the label element */
-            label p { font-size: var(--label-size) !important; font-weight: 500; }
-            [data-testid="stWidgetLabel"] p { font-size: var(--label-size) !important; font-weight: 500; }
-            .stRadio label p, .stCheckbox label p { font-size: var(--label-size) !important; }
-            .stFileUploader label p { font-size: var(--label-size) !important; font-weight: 500; }
-
-            /* Input field values */
-            .stNumberInput input, .stTextInput input { font-size: var(--input-size) !important; }
-            .stSelectbox div[data-baseweb="select"] { font-size: var(--input-size); }
-            .stFileUploader section { font-size: var(--input-size); }
-
-            /* Captions — secondary hint text */
-            .stCaption p { font-size: var(--caption-size) !important; }
-
-            /* Tabs — full width, equal spacing, intuitive and clickable */
-            .stTabs [data-baseweb="tab-list"] {
-                width: 100%;
-                display: flex;
-                gap: 8px;
-            }
-            .stTabs [data-baseweb="tab"] {
-                flex: 1;
-                justify-content: center;
-                padding: 10px 0;
-                border-radius: 6px 6px 0 0;
-                background: rgba(255,255,255,0.05);
-                cursor: pointer;
-                transition: background 0.2s ease;
-                font-weight: 400;
-            }
-            .stTabs [data-baseweb="tab"]:hover {
-                background: rgba(255,255,255,0.1);
-            }
-            .stTabs [data-baseweb="tab"][aria-selected="true"] {
-                background: rgba(255,255,255,0.12);
-                border-bottom: 2px solid #1C83E1;
-                font-weight: 600;
-            }
-            .stTabs [data-baseweb="tab"] p { font-size: var(--tab-size) !important; }
-            .stTabs [data-baseweb="tab"][aria-selected="true"] p { font-size: var(--tab-size) !important; font-weight: 600 !important; }
-            .stTabs button p { font-size: var(--tab-size) !important; }
-
-            /* Buttons */
-            .stButton button, .stDownloadButton button { font-size: var(--button-size); }
-        </style>
-    """, unsafe_allow_html=True)
+    _css_path = os.path.join(os.path.dirname(__file__), "..", ".streamlit", "custom.css")
+    with open(_css_path) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
     init_session_state()
 

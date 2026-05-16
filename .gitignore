@@ -14,13 +14,12 @@ venv/
 env/
 ENV/
 
-# Streamlit
-.streamlit/
+# Streamlit — only secrets excluded; config.toml and custom.css are safe to commit
+.streamlit/secrets.toml
 
 # Environment & secrets
 .env
 *.env
-secrets.toml
 
 # OS
 .DS_Store

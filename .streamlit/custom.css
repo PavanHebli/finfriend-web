@@ -13,7 +13,7 @@ html, body, [class*="css"], .stMarkdown, button, input, select, textarea {
 /* Keep menu visible — it contains the Light/Dark theme toggle */
 #MainMenu { visibility: visible !important; }
 [data-testid="stMainMenuPopover"] { display: block !important; }
-footer { visibility: hidden; }
+footer { display: none !important; }
 [data-testid="stDecoration"] { display: none; }
 
 /* ── Scale variables ──────────────────────────────────────────── */
